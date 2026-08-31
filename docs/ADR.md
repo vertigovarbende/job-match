@@ -174,3 +174,37 @@ Domain modelleri (Job, Candidate, Company, JobApplication, MatchResult vb.) yaln
 - Domain modeli (domain/model) ile JPA persistence entity (infrastructure/persistence) ayrı tutulur — bkz. ARCHITECTURE.md Domain katmanı kuralları (@Entity, JpaRepository domain'de bulunmaz). İkisi arasında mapper (MapStruct) kullanılır; "entity" ifadesi DDD anlamında domain modelini, JPA `@Entity` ise yalnızca persistence detayını ifade eder.
 - Value Object'ler (MatchScore, SalaryRange, Money vb.) kendi invariant'larını constructor'da doğrular (bkz. DOMAIN_MODEL.md `MatchScore` örneği).
 - Code review'da yalnızca getter/setter'dan ibaret domain sınıfı veya business rule'un service katmanında if/else zinciriyle yürütülmesi pattern'i reddedilir.
+
+---
+
+## ADR-011 — Custom Exception Hiyerarşisi ve Katmanlı (Tiered) Global Exception Handling
+
+**Status:** Accepted
+
+### Decision
+
+Tüm custom (framework olmayan) exception'lar, nötr ve boş bir kök sınıf olan `JobMatchException`'ı extend eder. Bu kökten, her biri belirli bir hata kategorisini temsil eden kardeş "aile" sınıfları türer: `DomainRuleViolationException` (iş kuralı/invariant ihlalleri, 422), `JobMatchResourceNotFoundException` (404), `JobMatchConflictException` (409), `JobMatchForbiddenException` (403), `JobMatchAuthenticationException` (401), `JobMatchProcessException` (süreç/state-machine ihlalleri, 409) ve `JobMatchInvalidArgumentException` (400 — domain seviyesinde fırlatılan geçersiz argüman durumları, framework seviyesi Bean Validation'dan ayrı). Her modül, kendi somut exception'larını (ör. `job.domain.JobNotFoundException`) ilgili aileden türetir ve kendi modül-özel `ErrorCode` enum'unu (ör. `JobErrorCode.JOB_NOT_FOUND`) taşır.
+
+`GlobalExceptionHandler`, exception'ları dört katmanda ele alır:
+
+1. **Framework exception'ları** (`MethodArgumentNotValidException`, `ConstraintViolationException`, `MethodArgumentTypeMismatchException` vb.) — her biri için ayrı, statik `@ResponseStatus` kullanan handler.
+2. **Aile bazlı custom exception'lar** — her aile (`JobMatchResourceNotFoundException`, `JobMatchConflictException` vb.) için tek bir handler; statü ailenin doğası gereği sabit olduğundan yine statik `@ResponseStatus` kullanılır.
+3. **Genel `JobMatchException` fallback'i** — hiçbir aileye oturmayan ama yine de bir `ErrorCode` taşıyan durumlar için; statü derleme zamanında bilinemediğinden `ResponseEntity` ile `HttpStatus.valueOf(exception.getErrorCode().status())` kullanılarak dinamik olarak set edilir.
+4. **Gerçekten beklenmeyen exception'lar** (`Exception.class`) — `CommonErrorCode.INTERNAL_SERVER_ERROR` (`GEN_001`) ile 500 döner, statik `@ResponseStatus`.
+
+Spring, `@ExceptionHandler` seçimini class içindeki tanım sırasına göre değil, fırlatılan exception'ın hiyerarşisindeki en spesifik eşleşen tipe göre yaptığından, katmanların fiziksel sırası önemli değildir.
+
+`ErrorCode` interface'i (`shared.domain.ErrorCode`) dört metod içerir: `code()`, `header()`, `status()` (framework'ten bağımsız `int`) ve `defaultMessage()`. `header()` metodu, generic (aile/fallback) handler'ların `exception.getErrorCode().header()` üzerinden tutarlı bir kategori etiketi okuyabilmesi için eklenmiştir; öncesinde bu bilgi yalnızca `CommonErrorCode`'un enum olmasından gelen `.name()` ile elde edilebiliyordu ve bu, interface'in bir parçası değildi.
+
+### Rationale
+
+- `DomainRuleViolationException`'ı tüm exception'ların ortak köküne dönüştürmek yerine kardeş bir aile olarak bırakmak, isimlendirmenin anlamını korur — "forbidden" veya "authentication" bir domain rule violation değildir.
+- Aile bazlı handler'lar, her modülün her exception'ı için ayrı ayrı `GlobalExceptionHandler` metodu yazma ihtiyacını ortadan kaldırır; yeni bir modül exception'ı doğru aileyi extend ettiği sürece otomatik olarak doğru HTTP status'a eşlenir.
+- Katman 3 (genel `JobMatchException` fallback'i), `ErrorCode.status()` alanına ilk kez gerçek bir işlev kazandırır; Katman 1/2'de statü sabit olduğu için `@ResponseStatus` yeterliyken, Katman 3'te statü yalnızca runtime'da elimizdeki `ErrorCode`'dan okunabilir.
+- Katman 4, framework dışı/öngörülemeyen hatalarda (ör. `NullPointerException`) API tüketicisinin hâlâ tutarlı bir `ErrorResponse` formatı görmesini garanti eder; bu katman olmadan böyle hatalar Spring'in varsayılan `/error` formatına düşerdi.
+
+### Consequences
+
+- `JobMatchProcessException` ile `DomainRuleViolationException` arasındaki sınır bazı durumlarda belirsiz olabilir (ör. bir state-machine geçiş kuralı aynı zamanda bir domain invariant'ı da ihlal edebilir); her modül kendi exception'ını yazarken hangi aileye ait olduğuna açıkça karar vermelidir.
+- `GlobalExceptionHandler` içinde bazı handler metodları `ErrorResponse` (statik statü), bazıları `ResponseEntity<ErrorResponse>` (dinamik statü) döner — bu kasıtlı bir tutarsızlıktır, her handler'ın kendi statü belirleme ihtiyacına göre seçilmiştir.
+- Her modülün kendi `ErrorCode` enum'unu ve somut exception sınıflarını tanımlarken doğru aileyi seçmesi, code review'da kontrol edilmesi gereken bir noktadır.

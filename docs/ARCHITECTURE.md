@@ -114,11 +114,26 @@ com.example.jobmatch
 ```text
 shared
 ├── presentation
-│   └── rest
-│       └── GlobalExceptionHandler   → tüm modüllerin fırlattığı exception'ları RFC 7807 (API.md) formatına çevirir
+│   ├── response
+│   │   ├── BaseResponse             → başarılı response'ların ortak zarfı (bkz. API.md)
+│   │   └── ErrorResponse            → hata response'larının ortak şeması (bkz. API.md)
+│   └── exception
+│       ├── CommonErrorCode          → framework/altyapı seviyesinde oluşan genel hata kodları
+│       └── handler
+│           └── GlobalExceptionHandler → tüm modüllerin fırlattığı exception'ları ErrorResponse formatına çevirir (bkz. API.md, ADR-011)
 └── domain
-    └── DomainRuleViolationException → tüm modüllerin domain exception'larının extend ettiği ortak base class
+    ├── ErrorCode                         → her modülün kendi ErrorCode enum'unun implemente ettiği, framework'ten bağımsız kontrat
+    ├── JobMatchException                 → tüm custom exception'ların ortak, nötr kökü (bkz. ADR-011)
+    ├── DomainRuleViolationException      → iş kuralı/invariant ihlalleri ailesi (422)
+    ├── JobMatchResourceNotFoundException → "kaynak bulunamadı" ailesi (404)
+    ├── JobMatchConflictException         → çakışma ailesi (409)
+    ├── JobMatchForbiddenException        → yetkilendirme ailesi (403)
+    ├── JobMatchAuthenticationException   → kimlik doğrulama ailesi (401)
+    ├── JobMatchProcessException          → süreç/state-machine ihlalleri ailesi (409)
+    └── JobMatchInvalidArgumentException  → geçersiz/beklenmeyen argüman ailesi (400)
 ```
+
+Modül-özel exception'lar (ör. `job.domain.JobNotFoundException`) ilgili aileyi extend eder ve kendi modülünün `ErrorCode`'unu (ör. `JobErrorCode.JOB_NOT_FOUND`) taşır — bkz. ADR-011.
 
 `shared` bilinçli olarak minimal tutulur — modül-spesifik business logic (job/candidate/company vb.) buraya taşınmaz, yalnızca gerçekten tüm modüller arasında paylaşılan, feature'a özgü olmayan kod barındırır. Aksi halde "her şeyin atıldığı çöp kutusu" (God/util package) anti-pattern'ine dönüşür.
 
@@ -259,3 +274,46 @@ prod → staging/production (Neon)
 ```
 
 `application.yaml` (ortak ayarlar) + `application-{profile}.yaml` (profile'a özel override) yapısı kullanılır; aktif profil `SPRING_PROFILES_ACTIVE` ortam değişkeni ile seçilir (bkz. `.env` / `.env.example`).
+
+## 11. Custom Exception Hiyerarşisi ve GlobalExceptionHandler Stratejisi
+
+Tüm custom (framework olmayan) exception'lar `shared.domain.JobMatchException` adlı nötr, boş bir kökten türer (bkz. ADR-011). Bu kökten yedi kardeş "aile" sınıfı türetilir:
+
+```text
+JobMatchException
+├── DomainRuleViolationException      → iş kuralı/invariant ihlalleri (422)
+├── JobMatchResourceNotFoundException → kaynak bulunamadı (404)
+├── JobMatchConflictException         → çakışma (409)
+├── JobMatchForbiddenException        → yetkilendirme hatası (403)
+├── JobMatchAuthenticationException   → kimlik doğrulama hatası (401)
+├── JobMatchProcessException          → süreç/state-machine ihlali (409)
+└── JobMatchInvalidArgumentException  → domain seviyesinde geçersiz argüman (400)
+```
+
+Her modül kendi somut exception'larını uygun aileden türetir, örneğin:
+
+```text
+job.domain.JobNotFoundException extends JobMatchResourceNotFoundException
+candidate.domain.CandidateNotFoundException extends JobMatchResourceNotFoundException
+```
+
+Her somut exception, kendi modülünün `ErrorCode` implementasyonunu (ör. `JobErrorCode.JOB_NOT_FOUND`) taşır; `GlobalExceptionHandler` bu `ErrorCode`'dan `code`/`message`'ı okuyarak `ErrorResponse` üretir.
+
+Konvansiyon: `JobMatchException` ve her aile sınıfı (root dahil), `Serializable` olan `RuntimeException`'dan türediği için kendi `serialVersionUID`'sini bildirir (`@Serial private static final long serialVersionUID = 1L;` — gerçek bir cross-version serialization ihtiyacı yok, yalnızca IDE/statik analiz uyarılarını (ör. SonarQube `java:S2057`) susturmak içindir, bu yüzden anlamlı bir hash yerine sabit `1L` kullanılır). Bu konvansiyon, ileride yazılacak modül-özel somut exception sınıfları (ör. `JobNotFoundException`) için de geçerlidir — `serialVersionUID` inherit olmadığından her sınıf kendi alanını tanımlamalıdır.
+
+> **Not:** `JobMatchProcessException` ile `DomainRuleViolationException` arasındaki sınır bazı durumlarda belirsiz olabilir (ör. bir state-machine geçiş kuralı aynı zamanda bir domain invariant'ı da ihlal edebilir). Yeni bir exception yazılırken hangi aileye ait olduğuna açıkça karar verilmelidir — bkz. ADR-011 Consequences.
+
+### GlobalExceptionHandler — 4 Katmanlı Strateji
+
+`GlobalExceptionHandler`, exception'ları dört katmanda ele alır (bkz. ADR-011):
+
+| Katman | Kapsam | Statü belirleme |
+|---|---|---|
+| 1 | Framework exception'ları (`MethodArgumentNotValidException`, `ConstraintViolationException`, `MethodArgumentTypeMismatchException`, `HttpMessageNotReadableException` → 400, `HttpRequestMethodNotSupportedException` → 405, `HttpMediaTypeNotSupportedException` → 415) | Statik `@ResponseStatus` |
+| 2 | Aile bazlı custom exception'lar (`DomainRuleViolationException` → 422, `JobMatchResourceNotFoundException` → 404, `JobMatchConflictException` → 409, `JobMatchForbiddenException` → 403, `JobMatchAuthenticationException` → 401, `JobMatchProcessException` → 409, `JobMatchInvalidArgumentException` → 400) | Statik `@ResponseStatus` (ailenin statüsü sabittir) |
+| 3 | Genel `JobMatchException` fallback'i (hiçbir aileye oturmayan durumlar) | Dinamik — `ResponseEntity` + `HttpStatus.valueOf(exception.getErrorCode().status())` |
+| 4 | Gerçekten beklenmeyen exception'lar (`Exception.class`) | Statik `@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)`, `CommonErrorCode.INTERNAL_SERVER_ERROR` |
+
+Katman 3, `ErrorCode.status()`'a (framework'ten bağımsız `int`) ilk kez gerçek bir işlev kazandırır — Katman 1/2'de statü sabit olduğundan `@ResponseStatus` yeterlidir, ama Katman 3'te statü yalnızca runtime'da elimizdeki `ErrorCode`'dan okunabilir. Spring, `@ExceptionHandler` seçimini class içindeki tanım sırasına göre değil, fırlatılan exception'ın hiyerarşisindeki en spesifik eşleşen tipe göre yaptığı için katmanların fiziksel sırası önemli değildir.
+
+`ErrorCode` interface'i dört metod içerir: `code()`, `header()`, `status()` (framework'ten bağımsız `int`) ve `defaultMessage()`. `header()`, generic (aile/fallback) handler'ların `exception.getErrorCode().header()` üzerinden tutarlı bir kategori etiketi okuyabilmesini sağlar; artık `CommonErrorCode`'un enum olmasından gelen `.name()`'e bağımlı değildir.

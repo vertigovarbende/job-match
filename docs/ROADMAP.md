@@ -6,7 +6,15 @@
 - [ ] Java/Spring Boot project
 - [x] Test altyapısı: maven-surefire-plugin (unit, `mvn test`) + maven-failsafe-plugin (integration, `mvn verify`) ayrımı, `*IT.java` naming convention
 - [ ] Clean Architecture package conventions
-  - [ ] `shared` modülü — ilk somut paket (bkz. ARCHITECTURE.md #3): `GlobalExceptionHandler` (`@RestControllerAdvice`, RFC 7807/API.md formatında) + ortak base exception class
+  - [x] `shared` modülü — ilk somut paket (bkz. ARCHITECTURE.md #3, #11 ve ADR-011)
+    - [x] `BaseResponse` / `ErrorResponse` (`shared.presentation.response`)
+    - [x] `ErrorCode` (`shared.domain`) + `CommonErrorCode` (`shared.presentation.exception`)
+    - [x] `GlobalExceptionHandler` — Katman 1 (framework exception'ları: `MethodArgumentNotValidException`, `ConstraintViolationException`, `MethodArgumentTypeMismatchException`)
+    - [x] `GlobalExceptionHandler` — Katman 1'e `HttpMessageNotReadableException` (+ `ErrorResponse.subErrors(InvalidFormatException)` overload'u), `HttpRequestMethodNotSupportedException`, `HttpMediaTypeNotSupportedException` eklendi
+    - [x] `ErrorCode` interface'ine dördüncü metod (`header()`) eklenmesi + `CommonErrorCode`'un buna göre güncellenmesi
+    - [x] `JobMatchException` kökü ve aile sınıfları (`DomainRuleViolationException`, `JobMatchResourceNotFoundException`, `JobMatchConflictException`, `JobMatchForbiddenException`, `JobMatchAuthenticationException`, `JobMatchProcessException`, `JobMatchInvalidArgumentException`)
+    - [x] `GlobalExceptionHandler` — Katman 2 (aile bazlı handler'lar), Katman 3 (`JobMatchException` fallback, dinamik statü), Katman 4 (`Exception.class` catch-all → `GEN_001`)
+    - [x] `GlobalExceptionHandlerTest` — 15 handler metodunun tamamı için birim testi (Ays referans projesindeki doğrudan-çağrı + oracle-stil assertion yaklaşımı baz alınarak; HTTP statü doğrulaması MockMvc gerektirmediği için yalnızca Katman 3'te (`ResponseEntity` üzerinden) yapılır)
 - [ ] Docker Compose (PostgreSQL ile başlar; diğer servisler kendi fazlarında eklenir)
 - [x] Spring profilleri: application.yaml + application-dev.yaml / application-test.yaml / application-prod.yaml
 - [ ] PostgreSQL (local: Docker Compose, bkz. ADR-009)
