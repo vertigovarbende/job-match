@@ -109,6 +109,19 @@ com.example.jobmatch
 
 `controller/service/repository/entity` şeklinde tüm sistemi yatay bölmek yerine bounded context/feature bazlı paketleme tercih edilir.
 
+`shared` modülü, tek bir feature/bounded context'e ait olmayan cross-cutting concern'leri barındırır:
+
+```text
+shared
+├── presentation
+│   └── rest
+│       └── GlobalExceptionHandler   → tüm modüllerin fırlattığı exception'ları RFC 7807 (API.md) formatına çevirir
+└── domain
+    └── DomainRuleViolationException → tüm modüllerin domain exception'larının extend ettiği ortak base class
+```
+
+`shared` bilinçli olarak minimal tutulur — modül-spesifik business logic (job/candidate/company vb.) buraya taşınmaz, yalnızca gerçekten tüm modüller arasında paylaşılan, feature'a özgü olmayan kod barındırır. Aksi halde "her şeyin atıldığı çöp kutusu" (God/util package) anti-pattern'ine dönüşür.
+
 ## 4. Port Örneği
 
 ```java
