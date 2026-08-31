@@ -150,3 +150,4 @@ MVP kapsamında:
 - [Testing Strategy](TESTING.md)
 - [Roadmap](ROADMAP.md)
 - [Architecture Decisions](ADR.md)
+- [Contributing](CONTRIBUTING.md)
