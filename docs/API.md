@@ -125,15 +125,35 @@ GET /candidates/me/recommended-jobs
 
 ## Error Format
 
-RFC 7807 Problem Details benzeri ortak format kullanılabilir:
+Hatalar `ErrorResponse` formatında döner (`shared/presentation/response/ErrorResponse.java`, bkz. ARCHITECTURE.md #3):
 
 ```json
 {
-  "type": "https://api.example.com/problems/job-not-found",
-  "title": "Job not found",
-  "status": 404,
-  "detail": "The requested job could not be found.",
-  "instance": "/api/v1/jobs/123",
-  "traceId": "..."
+  "time": "2026-08-31T14:23:10.512",
+  "code": "GEN_002",
+  "header": "VALIDATION_ERROR",
+  "message": "Validation failed.",
+  "isSuccess": false,
+  "subErrors": [
+    {
+      "message": "must not be blank",
+      "field": "title",
+      "value": "",
+      "type": "NotBlank"
+    }
+  ]
 }
 ```
+
+Alan açıklamaları:
+
+- `time`: Hatanın oluştuğu zaman.
+- `code`: İlgili `ErrorCode` implementasyonundan gelen makine-okunabilir kod (örn. `GEN_002`), bkz. `CommonErrorCode` (genel/framework hataları) ve modül-özel `ErrorCode` implementasyonları (örn. ileride eklenecek `JobErrorCode`).
+- `header`: Hatanın kısa kategorisi (`ErrorCode` enum sabitinin adı, örn. `VALIDATION_ERROR`).
+- `message`: İnsan-okunabilir özet mesaj.
+- `isSuccess`: Her zaman `false`. Başarılı response'lar `BaseResponse` ile döner (bkz. ARCHITECTURE.md #3), farklı bir zarf kullanır — `ErrorResponse` ile karıştırılmamalıdır.
+- `subErrors`: Yalnızca alan bazlı doğrulama hatası varsa doludur; yoksa response'ta hiç yer almaz. Her `subError` şu alanları taşır: `message` (hata mesajı), `field` (ilgili alan adı), `value` (reddedilen değer, varsa), `type` (ihlal edilen kısıtın adı, örn. `NotBlank`, `Size`). `value` ve `type` yalnızca doluysa serialize edilir.
+
+`subErrors` şu durumlarda doldurulur: `MethodArgumentNotValidException` (request body validasyonu), `ConstraintViolationException` (path/query parametre veya servis seviyesi validasyonu), `MethodArgumentTypeMismatchException` (tip uyuşmazlığı), `InvalidFormatException` (bozuk JSON body'de bir alanın hedef tipe uymaması — `HttpMessageNotReadableException`'ın cause'u bu tipteyse doldurulur, saf sözdizimi hatalarında `subErrors` boş kalır). Bkz. `shared/presentation/exception/handler/GlobalExceptionHandler.java`.
+
+Yukarıdaki örnek bir validasyon hatasıdır (`GEN_002` / `VALIDATION_ERROR`); `code`, `header` ve HTTP status, hangi exception ailesinin fırladığına göre değişir (ör. "kaynak bulunamadı" durumunda 404 ile birlikte modül-özel bir kod döner, `subErrors` bu durumlarda genellikle boştur). Exception hiyerarşisi ve hangi ailenin hangi statüye eşlendiği için bkz. ARCHITECTURE.md #11 ve ADR-011.
