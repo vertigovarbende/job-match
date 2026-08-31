@@ -1,0 +1,15 @@
+# test profili — otomatik testler (unit/application testlerinde genelde hiç yüklenmez;
+# integration testlerde Testcontainers ile birlikte kullanılır, bkz. docs/TESTING.md).
+# PostgreSQL/Kafka/Elasticsearch/Redis bağlantı bilgileri statik olarak burada SABİTLENMEZ;
+# Testcontainers'ın dinamik property injection'ı (@ServiceConnection / DynamicPropertySource)
+# ile testin kendi ayağa kaldırdığı container'lara yönlendirilir.
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    com.deveyk.jobmatch: DEBUG
+    org.testcontainers: INFO

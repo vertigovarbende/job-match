@@ -236,3 +236,13 @@ Neon kullanılan ortamlarda iki farklı connection string ayrımı yapılmalıd�
 - **Direct connection**: Flyway migration'ları, `pg_dump` ve (ileride kullanılırsa) logical replication/CDC için kullanılır. PgBouncer'ın transaction pooling modu DDL ve advisory lock içeren işlemlerle uyumlu değildir.
 
 Local ve Testcontainers ortamlarında bu ayrım gerekmez; tek bir standart Postgres connection string yeterlidir.
+
+Spring profilleri:
+
+```text
+dev  → local development (senin bilgisayarın, Docker Compose)
+test → otomatik testler (Testcontainers ile)
+prod → staging/production (Neon)
+```
+
+`application.yaml` (ortak ayarlar) + `application-{profile}.yaml` (profile'a özel override) yapısı kullanılır; aktif profil `SPRING_PROFILES_ACTIVE` ortam değişkeni ile seçilir (bkz. `.env` / `.env.example`).

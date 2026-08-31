@@ -7,6 +7,7 @@
 - [x] Test altyapısı: maven-surefire-plugin (unit, `mvn test`) + maven-failsafe-plugin (integration, `mvn verify`) ayrımı, `*IT.java` naming convention
 - [ ] Clean Architecture package conventions
 - [ ] Docker Compose
+- [x] Spring profilleri: application.yaml + application-dev.yaml / application-test.yaml / application-prod.yaml
 - [ ] PostgreSQL (local: Docker Compose, bkz. ADR-009)
 - [ ] Flyway (local ve Neon direct connection ile test edilir)
 - [ ] Global exception handling

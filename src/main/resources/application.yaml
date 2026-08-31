@@ -1,3 +1,8 @@
 spring:
   application:
     name: jobmatch
+  profiles:
+    default: dev
+
+server:
+  port: ${SERVER_PORT}

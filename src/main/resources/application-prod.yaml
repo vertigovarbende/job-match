@@ -1,0 +1,36 @@
+# prod profili — staging/production (Neon + staging/production Keycloak realm, bkz. docs/ADR.md ADR-008, ADR-009)
+# Aktifleştirme: SPRING_PROFILES_ACTIVE=prod
+# NOT: Buradaki değerlerin hiçbirinde fallback/default YOKTUR (dev.yaml'daki gibi ${VAR:default} kullanılmaz).
+# Bilinçli bir tercih: prod'da bir secret eksikse uygulama sessizce localhost'a düşmek yerine
+# başlangıçta (startup) hata vererek durmalı.
+
+spring:
+  datasource:
+    url: ${NEON_DATABASE_URL_POOLED}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
+  elasticsearch:
+    uris: ${ELASTICSEARCH_SCHEME}://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+
+logging:
+  level:
+    com.deveyk.jobmatch: INFO
+    root: WARN
