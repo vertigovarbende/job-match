@@ -2,9 +2,12 @@
 
 ## Phase 0 — Foundation
 
-- [ ] Repository setup
+- [ ] Repository setup (GitHub repo idaresi: branch protection, PR template vb. — bkz. CONTRIBUTING.md)
 - [ ] Java/Spring Boot project
 - [x] Test altyapısı: maven-surefire-plugin (unit, `mvn test`) + maven-failsafe-plugin (integration, `mvn verify`) ayrımı, `*IT.java` naming convention
+  - [x] Persistence bağımlılıkları: `spring-boot-starter-data-jpa`, `postgresql` (runtime), `flyway-core` + `flyway-database-postgresql`, `spring-boot-testcontainers` + `testcontainers:postgresql` (test)
+  - [x] `LogTrackerConfiguration` (`testsupport`) — Logback `ListAppender` tabanlı log assertion altyapısı, Spring'den bağımsız, `@AfterEach`'te appender detach edilir (appender leak'i önlemek için)
+  - [x] `TestContainerConfiguration` (`testsupport`, `LogTrackerConfiguration`'ı extend eder) — tek seferlik (singleton) PostgreSQL container + `@ServiceConnection`; Flyway varsayılan olarak etkin (gerçek migration'lara karşı test), `ddl-auto: validate` `application-test.yaml`'da
 - [ ] Clean Architecture package conventions
   - [x] `shared` modülü — ilk somut paket (bkz. ARCHITECTURE.md #3, #11 ve ADR-011)
     - [x] `BaseResponse` / `ErrorResponse` (`shared.presentation.response`)
@@ -15,10 +18,11 @@
     - [x] `JobMatchException` kökü ve aile sınıfları (`DomainRuleViolationException`, `JobMatchResourceNotFoundException`, `JobMatchConflictException`, `JobMatchForbiddenException`, `JobMatchAuthenticationException`, `JobMatchProcessException`, `JobMatchInvalidArgumentException`)
     - [x] `GlobalExceptionHandler` — Katman 2 (aile bazlı handler'lar), Katman 3 (`JobMatchException` fallback, dinamik statü), Katman 4 (`Exception.class` catch-all → `GEN_001`)
     - [x] `GlobalExceptionHandlerTest` — 15 handler metodunun tamamı için birim testi (Ays referans projesindeki doğrudan-çağrı + oracle-stil assertion yaklaşımı baz alınarak; HTTP statü doğrulaması MockMvc gerektirmediği için yalnızca Katman 3'te (`ResponseEntity` üzerinden) yapılır)
-- [ ] Docker Compose (PostgreSQL ile başlar; diğer servisler kendi fazlarında eklenir)
+- [ ] Persistence altyapısı (bkz. ADR-009)
+  - [x] Docker Compose: PostgreSQL container (local development; diğer servisler kendi fazlarında eklenir)
+  - [x] `spring-boot-starter-data-jpa`, `postgresql` (runtime), `flyway-core` + `flyway-database-postgresql` bağımlılıkları (pom.xml)
+  - [ ] Flyway migration altyapısı (local Docker Compose ve Neon direct connection ile test edilir)
 - [x] Spring profilleri: application.yaml + application-dev.yaml / application-test.yaml / application-prod.yaml
-- [ ] PostgreSQL (local: Docker Compose, bkz. ADR-009)
-- [ ] Flyway (local ve Neon direct connection ile test edilir)
 - [ ] Base security setup
 
 ## Phase 1 — Identity
