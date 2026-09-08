@@ -86,14 +86,20 @@ com.example.jobmatch
 ├── job
 │   ├── domain
 │   │   ├── model
-│   │   └── service
+│   │   ├── service
+│   │   └── repository        → repository port'ları (örnek: JobRepository, "Port" soneki kullanılmaz)
 │   ├── application
 │   │   ├── port
 │   │   │   ├── in
-│   │   │   └── out
+│   │   │   └── out           → repository dışındaki outbound port'lar (search, messaging vb.)
 │   │   └── service
 │   ├── infrastructure
 │   │   ├── persistence
+│   │   │   └── postgres
+│   │   │       ├── entity      → JPA persistence entity'leri
+│   │   │       ├── repository  → Spring Data JPA repository'leri (teknik detay)
+│   │   │       ├── mapper      → domain model <-> JPA entity mapping (MapStruct)
+│   │   │       └── adapter     → domain.repository port'unu implement eden adapter (örnek: JobRepositoryAdapter)
 │   │   ├── search
 │   │   └── messaging
 │   └── presentation
@@ -104,8 +110,11 @@ com.example.jobmatch
 ├── application
 ├── matching
 ├── identity
+├── audit
 └── shared
 ```
+
+Repository port'larının `domain.repository` altında (application.port.out yerine) tanımlanması ve implementasyonlarının `<Feature>RepositoryAdapter` (örnek: `JobRepositoryAdapter`) olarak adlandırılması, `audit` modülü inşa edilirken netleştirilen bir konvansiyondur (bkz. docs/AUDIT.md). Bu yalnızca repository (persistence) port'ları için geçerlidir; search/messaging gibi diğer outbound port'lar `application.port.out` altında kalmaya devam eder.
 
 `controller/service/repository/entity` şeklinde tüm sistemi yatay bölmek yerine bounded context/feature bazlı paketleme tercih edilir.
 
@@ -139,12 +148,16 @@ Modül-özel exception'lar (ör. `job.domain.JobNotFoundException`) ilgili ailey
 
 ## 4. Port Örneği
 
+Repository (persistence) port'ları `domain.repository` altında, "Port" soneki olmadan tanımlanır; implementasyonları `infrastructure.persistence.<teknoloji>.adapter` altında `<Feature>RepositoryAdapter` olarak adlandırılır (örnek: `JobRepositoryAdapter`, bkz. docs/AUDIT.md):
+
 ```java
-public interface JobRepositoryPort {
+public interface JobRepository {
     Job save(Job job);
     Optional<Job> findById(JobId id);
 }
 ```
+
+Repository dışındaki outbound port'lar (search, messaging vb.) `application.port.out` altında kalmaya devam eder:
 
 ```java
 public interface JobSearchPort {
@@ -158,17 +171,20 @@ Application service yalnızca interface'leri bilir.
 
 ### PostgreSQL
 
+Uygulama tabloları `jm_` öneki ile oluşturulur (bkz. docs/AUDIT.md — bu konvansiyon audit_log tablosu için karar verilirken netleştirilmiştir).
+
 Transactional business state:
 
-- users
-- candidates
-- companies
-- jobs
-- applications
-- skills
-- candidate_skills
-- job_skills
-- outbox_events
+- jm_users
+- jm_candidates
+- jm_companies
+- jm_jobs
+- jm_applications
+- jm_skills
+- jm_candidate_skills
+- jm_job_skills
+- jm_outbox_events
+- jm_audit_log
 
 ### Elasticsearch
 

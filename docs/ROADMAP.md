@@ -22,6 +22,9 @@
   - [x] Docker Compose: PostgreSQL container (local development; diğer servisler kendi fazlarında eklenir)
   - [x] `spring-boot-starter-data-jpa`, `postgresql` (runtime), `flyway-core` + `flyway-database-postgresql` bağımlılıkları (pom.xml)
   - [ ] Flyway migration altyapısı (local Docker Compose ve Neon direct connection ile test edilir)
+- [x] Audit altyapısı (generic audit log mekanizması — bkz. AUDIT.md)
+  - [x] `audit` modülü: `AuditAction`, `AuditableDomainEvent`, `AuditLog` domain modeli, `AuditRepository` portu, `AuditRepositoryAdapter`, generic `AuditEventListener`
+  - [x] `jm_audit_log` tablosu (Flyway `V1__create_jm_audit_log_table.sql` — projenin ilk migration'ı)
 - [x] Spring profilleri: application.yaml + application-dev.yaml / application-test.yaml / application-prod.yaml
 - [ ] Base security setup
 
@@ -44,6 +47,8 @@
 - [ ] Experiences
 - [ ] Company profile
 - [ ] Employer-company membership
+- [ ] Company verification
+  - [ ] Audit entegrasyonu: verification, çalışan ekleme/çıkarma (bkz. AUDIT.md)
 
 ## Phase 3 — Job Management
 
@@ -52,6 +57,7 @@
 - [ ] Publish
 - [ ] Close
 - [ ] Archive
+  - [ ] Audit entegrasyonu: publish/close/archive event'leri (bkz. AUDIT.md)
 - [ ] Ownership authorization
 - [ ] Job REST API için Spring Cloud Contract (Groovy DSL) contract testleri
 
@@ -85,6 +91,7 @@
 - [ ] Candidate application history
 - [ ] Employer applicant list
 - [ ] Status workflow
+  - [ ] Audit entegrasyonu: status geçişleri (bkz. AUDIT.md)
 
 ## Phase 7 — Matching
 
@@ -109,6 +116,7 @@
 - [ ] Metrics
 - [ ] Health checks
 - [ ] Elasticsearch reindex tooling
+- [ ] HTTP request/response audit logging (teknik/güvenlik amaçlı; AUDIT.md'deki iş kararı audit'inden bağımsız, ayrı bir konu) — her request/response'un IP, header, body, status code gibi detaylarının yakalanıp bir stream'e gönderilmesi; AWS Kinesis yok, ama biz zaten Kafka'yı benimsediğimizden (bkz. ADR-004/005, Phase 5) ikinci bir streaming sistemi/AWS kilitlenmesi eklemek yerine Kafka üzerinden yapılması daha tutarlı olur
 - [ ] Neon staging/production ortam kurulumu (pooled + direct connection string, branching, autosuspend/always-on kararı)
 - [ ] Backup strategy (Neon point-in-time restore)
 - [ ] CI/CD
