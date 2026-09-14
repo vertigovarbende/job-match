@@ -1,0 +1,305 @@
+{
+  "realm": "jobmatch",
+  "enabled": true,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "verifyEmail": true,
+  "resetPasswordAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "revokeRefreshToken": true,
+  "refreshTokenMaxReuse": 0,
+  "smtpServer": {
+    "host": "mailpit",
+    "port": "1025",
+    "from": "noreply@jobmatch.local",
+    "fromDisplayName": "JobMatch",
+    "auth": "false",
+    "ssl": "false",
+    "starttls": "false"
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "CANDIDATE",
+        "description": "Is arayan kullanici"
+      },
+      {
+        "name": "EMPLOYER",
+        "description": "Ise alim yapan sirket temsilcisi"
+      },
+      {
+        "name": "ADMIN",
+        "description": "Platform yoneticisi"
+      },
+      {
+        "name": "default-roles-jobmatch",
+        "description": "Self-registration ile kayit olan her kullaniciya otomatik atanan varsayilan rol seti (bkz. docs/IDENTITY.md madde 8).",
+        "composite": true,
+        "clientRole": false,
+        "composites": {
+          "realm": [
+            "CANDIDATE"
+          ]
+        }
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "jobmatch-app",
+      "name": "JobMatch Application",
+      "description": "Candidate/Employer/Admin icin tek public client (Auth Code + PKCE). Backend bu client'i kullanmaz, yalnizca Resource Server olarak token dogrular (bkz. IDENTITY.md madde 2.2). redirectUris dev asamasinda genis, frontend gelince daraltilmali.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "browserFlow": "jobmatch-browser",
+  "authenticationFlows": [
+    {
+      "alias": "jobmatch-browser",
+      "description": "Browser based authentication",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-spnego",
+          "authenticatorFlow": false,
+          "requirement": "DISABLED",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "identity-provider-redirector",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 25,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "ALTERNATIVE",
+          "priority": 26,
+          "flowAlias": "jobmatch-browser Organization",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "flowAlias": "jobmatch-browser forms",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "jobmatch-browser forms",
+      "description": "Username, password, otp and other auth forms.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 11,
+          "flowAlias": "OTP - Employer",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 12,
+          "flowAlias": "OTP - Admin",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "OTP - Employer",
+      "description": "EMPLOYER rolu icin conditional TOTP zorunlulugu (bkz. docs/IDENTITY.md madde 9).",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-role",
+          "authenticatorConfig": "Employer",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 0,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-conditional-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 1,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "OTP - Admin",
+      "description": "ADMIN rolu icin conditional TOTP zorunlulugu (bkz. docs/IDENTITY.md madde 9).",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-role",
+          "authenticatorConfig": "Admin",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 0,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-conditional-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 1,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "jobmatch-browser Organization",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 10,
+          "flowAlias": "jobmatch-browser Browser - Conditional Organization",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "jobmatch-browser Browser - Conditional Organization",
+      "description": "Flow to determine if the organization identity-first login is to be used",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-configured",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "organization",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "Employer",
+      "config": {
+        "condUserRole": "EMPLOYER"
+      }
+    },
+    {
+      "alias": "Admin",
+      "config": {
+        "condUserRole": "ADMIN"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "candidate-test",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "candidate@example.com",
+      "firstName": "Test",
+      "lastName": "Candidate",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Test1234!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "CANDIDATE"
+      ]
+    },
+    {
+      "username": "employer-test",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "employer@example.com",
+      "firstName": "Test",
+      "lastName": "Employer",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Test1234!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "EMPLOYER"
+      ]
+    },
+    {
+      "username": "admin-test",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "admin@example.com",
+      "firstName": "Test",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Test1234!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN"
+      ]
+    }
+  ]
+}

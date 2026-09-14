@@ -18,6 +18,30 @@ services:
       timeout: 5s
       retries: 5
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.3
+    container_name: jobmatch-keycloak
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HOSTNAME: http://localhost:${KEYCLOAK_PORT}
+    ports:
+      - "${KEYCLOAK_PORT}:8080"
+    volumes:
+      - jobmatch-keycloak-data:/opt/keycloak/data
+      - ./keycloak/import:/opt/keycloak/data/import
+
+  mailpit:
+    image: axllent/mailpit:v1.31.1
+    container_name: jobmatch-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_UI_PORT}:8025"
+
 volumes:
   jobmatch-postgresql-data:
     name: jobmatch-postgresql-data
+  jobmatch-keycloak-data:
+    name: jobmatch-keycloak-data

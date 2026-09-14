@@ -109,6 +109,27 @@
 		<!-- persistence dependencies   -->
 		<!-- ========================== -->
 
+		<!-- ===================== -->
+		<!-- security dependencies -->
+		<!-- ===================== -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- OAuth2 Resource Server (Keycloak JWT validation) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+		</dependency>
+
+
+
+		<!-- ===================== -->
+		<!-- security dependencies -->
+		<!-- ===================== -->
+
 
 		<!-- =================== -->
 		<!--  test dependencies  -->
@@ -142,6 +163,20 @@
 			<groupId>com.tngtech.archunit</groupId>
 			<artifactId>archunit-junit5</artifactId>
 			<version>1.5.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Testcontainers Keycloak -->
+		<dependency>
+			<groupId>com.github.dasniko</groupId>
+			<artifactId>testcontainers-keycloak</artifactId>
+			<version>4.3.1</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -243,6 +278,33 @@
 						<include>**/*ITCase.java</include>
 					</includes>
 				</configuration>
+			</plugin>
+			<!-- keycloak/import/realm-export.json'i test classpath'ine kopyalar (bkz. docs/IDENTITY.md
+			     madde 4.4); TestContainerConfiguration'daki KeycloakContainer bu kopyayi import eder.
+			     Ikinci bir elle-yazilmis realm export dosyasi olusturmamak icin tek kaynak korunuyor. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-keycloak-realm-export-for-tests</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.testOutputDirectory}/keycloak</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/keycloak/import</directory>
+									<includes>
+										<include>realm-export.json</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

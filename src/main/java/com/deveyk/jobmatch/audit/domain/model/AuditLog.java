@@ -2,19 +2,12 @@ package com.deveyk.jobmatch.audit.domain.model;
 
 import com.deveyk.jobmatch.audit.domain.AuditAction;
 import com.deveyk.jobmatch.audit.domain.event.AuditableDomainEvent;
+import com.deveyk.jobmatch.shared.domain.Guard;
 import lombok.Getter;
 
 import java.time.Instant;
 import java.util.Objects;
 
-/**
- * {@code audit_log}'a yazılacak bir kaydın framework'ten bağımsız domain temsili.
- * <p>
- * Bir {@link AuditableDomainEvent}'ten türetilir ({@link #from(AuditableDomainEvent)}); JPA
- * persistence entity'sinden ({@code AuditLogEntity}) bilinçli olarak ayrı tutulur (bkz.
- * ARCHITECTURE.md #2, ADR-010) — ikisi arasındaki mapping infrastructure katmanında MapStruct
- * ile yapılır.
- */
 @Getter
 public final class AuditLog {
 
@@ -38,8 +31,8 @@ public final class AuditLog {
         this.actorId = actorId;
         this.actorRole = actorRole;
         this.action = Objects.requireNonNull(action, "action must not be null");
-        this.targetType = requireNonBlank(targetType, "targetType");
-        this.targetId = requireNonBlank(targetId, "targetId");
+        this.targetType = Guard.requireNonBlank(targetType, "targetType");
+        this.targetId = Guard.requireNonBlank(targetId, "targetId");
         this.correlationId = correlationId;
         this.details = details;
         this.occurredAt = Objects.requireNonNull(occurredAt, "occurredAt must not be null");
@@ -59,11 +52,5 @@ public final class AuditLog {
         );
     }
 
-    private static String requireNonBlank(String value, String fieldName) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + " must not be blank");
-        }
-        return value;
-    }
 
 }
