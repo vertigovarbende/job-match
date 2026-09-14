@@ -16,7 +16,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @DisplayName("AuditRepositoryAdapter - Entegrasyon Testleri")
 class AuditRepositoryAdapterIT extends TestContainerConfiguration {
 

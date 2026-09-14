@@ -147,6 +147,7 @@ MVP kapsamında:
 - [Elasticsearch Design](ELASTICSEARCH.md)
 - [Event & Kafka Design](EVENTS.md)
 - [Security](SECURITY.md)
+- [Identity Design](IDENTITY.md)
 - [Audit Design](AUDIT.md)
 - [Testing Strategy](TESTING.md)
 - [Roadmap](ROADMAP.md)

@@ -26,19 +26,21 @@
   - [x] `audit` modülü: `AuditAction`, `AuditableDomainEvent`, `AuditLog` domain modeli, `AuditRepository` portu, `AuditRepositoryAdapter`, generic `AuditEventListener`
   - [x] `jm_audit_log` tablosu (Flyway `V1__create_jm_audit_log_table.sql` — projenin ilk migration'ı)
 - [x] Spring profilleri: application.yaml + application-dev.yaml / application-test.yaml / application-prod.yaml
-- [ ] Base security setup
+- [x] Base security setup (bkz. Phase 1 — Spring Security + OAuth2 Resource Server, docs/IDENTITY.md madde 4-5)
 
 ## Phase 1 — Identity
 
-- [ ] Keycloak Docker Compose servisi
-- [ ] Realm ve client konfigürasyonu (import script / IaC)
-- [ ] Candidate / Employer / Admin rollerinin Keycloak'ta tanımlanması
-- [ ] Spring Security OAuth2 Resource Server entegrasyonu
-- [ ] JWT claim → ROLE_* authority mapping
-- [ ] Uygulama içi user referans tablosu (Keycloak subject id ile)
-- [ ] Email doğrulama ve şifre sıfırlama akışlarının Keycloak üzerinden doğrulanması
-- [ ] Candidate: password + email verification (native) + social login (Google/LinkedIn, identity broker)
-- [ ] Employer/Admin: password + TOTP (conditional flow ile role bazlı zorunlu)
+- [x] Keycloak Docker Compose servisi
+- [x] Realm ve client konfigürasyonu (import script / IaC)
+- [x] Candidate / Employer / Admin rollerinin Keycloak'ta tanımlanması
+- [x] Spring Security OAuth2 Resource Server entegrasyonu
+- [x] JWT claim → ROLE_* authority mapping
+  - [ ] Client rolü/group desteği — ertelendi, somut bir ince taneli izin ihtiyacı çıktığında ayrı bir madde olarak ele alınacak (bkz. docs/IDENTITY.md, Refactor Notu 2)
+- [x] Uygulama içi user referans tablosu (Keycloak subject id ile)
+- [x] Email doğrulama ve şifre sıfırlama akışlarının Keycloak üzerinden doğrulanması
+- [x] Candidate: password + email verification (native)
+  - [ ] Social login (Google/LinkedIn, identity broker) — ertelendi, gerçek OAuth client id/secret eldeyken ayrı bir madde/PR olarak ele alınacak (bkz. docs/IDENTITY.md madde 8.1)
+- [x] Employer/Admin: password + TOTP (conditional flow ile role bazlı zorunlu)
 
 ## Phase 2 — Candidate & Company
 
