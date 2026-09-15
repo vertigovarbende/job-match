@@ -3,6 +3,7 @@ package com.deveyk.jobmatch.shared.infrastructure.persistence.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,6 +49,7 @@ public abstract class JmBaseEntity {
         this.updatedAt = Optional.ofNullable(this.createdAt).orElse(LocalDateTime.now());
     }
 
+    @PreUpdate
     public void preUpdate() {
         this.updatedBy = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getPrincipal)

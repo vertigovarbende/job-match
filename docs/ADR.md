@@ -208,3 +208,26 @@ Spring, `@ExceptionHandler` seçimini class içindeki tanım sırasına göre de
 - `JobMatchProcessException` ile `DomainRuleViolationException` arasındaki sınır bazı durumlarda belirsiz olabilir (ör. bir state-machine geçiş kuralı aynı zamanda bir domain invariant'ı da ihlal edebilir); her modül kendi exception'ını yazarken hangi aileye ait olduğuna açıkça karar vermelidir.
 - `GlobalExceptionHandler` içinde bazı handler metodları `ErrorResponse` (statik statü), bazıları `ResponseEntity<ErrorResponse>` (dinamik statü) döner — bu kasıtlı bir tutarsızlıktır, her handler'ın kendi statü belirleme ihtiyacına göre seçilmiştir.
 - Her modülün kendi `ErrorCode` enum'unu ve somut exception sınıflarını tanımlarken doğru aileyi seçmesi, code review'da kontrol edilmesi gereken bir noktadır.
+
+---
+
+## ADR-012 — Domain Model, Use-Case ve Value Object Tasarımında Sistematik SOLID/Cohesion/Coupling İncelemesi
+
+**Status:** Accepted
+
+### Decision
+
+Yeni bir domain modeli, use-case (port/in + Command + Service) veya value object tasarlanırken/kodlanırken, kod yazmaya geçmeden önceki tartışma aşamasının standart bir parçası olarak şu sorular sorulur: sınıfın/arayüzün tek bir sorumluluğu var mı (SRP); encapsulation gerçekten kendini koruyor mu (ör. invariant'ı bypass edebilecek bir public setter/method var mı); modüller ve aggregate'ler arası coupling ID-only mu kalıyor yoksa gereksiz bir object-graph bağımlılığı mı ekleniyor; ve bir soyutlama (ortak taban sınıf, generic tip, paylaşılan interface) gerçek/paylaşılan bir kavramı mı yoksa bugünkü tesadüfi bir yapısal benzerliği mi genelliyor. Bu inceleme yalnızca `candidate` modülüyle sınırlı değildir — `docs/ROADMAP.md`'deki tüm fazlarda (Job, Company, Application, Matching vb.) yazılacak her yeni domain/use-case/VO için geçerlidir.
+
+### Rationale
+
+- `feature/phase-02/candidate-skills` branch'i tamamlandıktan sonra yapılan bir UML class diagram incelemesi (bkz. docs/CANDIDATE_SKILLS.md, "Ek Düzeltme" bölümleri), kod yazılıp bittikten SONRA fark edilen iki gerçek sorun ortaya çıkardı: (1) tüm aggregate root'larda (`Candidate` dahil) blanket Lombok `@Setter` kullanımı, `update(...)` metodlarının sağladığı invariant korumasını bypass edilebilir hale getiriyordu — bu ayrıca ADR-010'un "domain modellerinde public setter kullanılmaz" kuralının fiilen ihlal edildiği anlamına geliyordu; (2) `Experience`/`Education`'ın `isCurrent()`'ı birebir aynıydı (essential duplication, bir `Ongoing` interface'iyle düzeltildi), `CandidateSkill`/`CandidateLanguage`'ın yapısal ikizliği ise bilinçli olarak birleştirilmedi (accidental duplication).
+- Bu tür sorunları kod yazıldıktan sonra bir "code review" adımında yakalamak yerine, madde/karar tartışması sırasında (yani bu projenin zaten izlediği "önce tartış, docs/*.md'ye yaz, sonra kodla" disiplininin bir parçası olarak) daha erken yakalamak, hem düzeltme maliyetini düşürür hem de zaten var olan ADR-010 gibi kararların fiilen uygulanmasını garanti eder.
+- "Essential vs. accidental duplication" ayrımı, DRY'ı körü körüne uygulamanın (her benzerliği zorla bir taban sınıfa/generic tipe çekmenin) tip güvenliğini ve gelecekteki ayrışma esnekliğini bozabileceğini fark ettirdi (bkz. generic UseCase'in ve `Guard` sınıfının reddedilme gerekçeleriyle aynı mantık, docs/CANDIDATE_SKILLS.md).
+
+### Consequences
+
+- Yeni bir domain modeli/use-case/VO tasarım tartışmasında (docs/*.md'ye karar yazılırken), yukarıdaki dört soru açıkça ele alınmalıdır; bu, code review'da ayrıca kontrol edilmesi gereken bir kontrol listesi maddesi haline gelir (ADR-010'un Consequences'ındaki "yalnızca getter/setter'dan ibaret domain sınıfı reddedilir" kuralının bir üst kümesi).
+- Lombok `@Setter`, domain modeli sınıflarında (`domain/model` altında) kullanılmaz — yalnızca `@Getter` ve gerekliyse `@SuperBuilder`; mutasyon yalnızca anlamlı domain metodları (`update(...)`, `updateProficiency(...)` vb.) üzerinden yapılır. Bu, ADR-010'un zaten var olan "public setter kullanılmaz" kuralının Lombok-spesifik netleştirmesidir.
+- Bir soyutlama (taban sınıf, generic tip) önerildiğinde, "bu iki/daha fazla sınıf gerçekten AYNI kavramı mı temsil ediyor, yoksa bugün şans eseri mi benziyor" sorusu açıkça tartışılmalı ve docs/*.md'ye gerekçesiyle kaydedilmelidir.
+- Bu ADR, mevcut kodun (`candidate-profile`, `candidate-skills`) geriye dönük gözden geçirilmesini tetikledi (bkz. docs/CANDIDATE_SKILLS.md "Ek Düzeltme" bölümleri); benzer bir gözden geçirme, ileride her yeni modül/branch tamamlandığında da (ör. Job, Company) tekrarlanmalıdır.
