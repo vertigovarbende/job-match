@@ -3,14 +3,12 @@ package com.deveyk.jobmatch.candidate.domain.model;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
-@Setter
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 public final class Candidate extends JmBaseDomain {

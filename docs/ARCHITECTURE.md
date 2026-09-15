@@ -15,7 +15,7 @@ Amaçlar:
 
 ### Domain
 
-Saf business logic içerir. **Rich domain model** prensibi uygulanır — anemic domain model'den kaçınılır (bkz. ADR-010).
+Saf business logic içerir. **Rich domain model** prensibi uygulanır — anemic domain model'den kaçınılır (bkz. ADR-010). Yeni domain modeli/use-case/VO tasarımında SOLID/cohesion/coupling sorularının sistematik olarak ele alınması gerekir (bkz. ADR-012).
 
 Örnek:
 

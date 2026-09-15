@@ -43,6 +43,27 @@ public enum CandidateErrorCode implements ErrorCode {
             "CANDIDATE_FIELD_INVALID",
             400,
             "A required candidate profile field is missing or invalid."
+    ),
+
+    CANDIDATE_RESOURCE_NOT_FOUND(
+            "CND_006",
+            "CANDIDATE_RESOURCE_NOT_FOUND",
+            404,
+            "The requested candidate-owned resource was not found."
+    ),
+
+    CANDIDATE_RESOURCE_FORBIDDEN(
+            "CND_007",
+            "CANDIDATE_RESOURCE_FORBIDDEN",
+            403,
+            "The requested resource does not belong to the candidate."
+    ),
+
+    CANDIDATE_RELATION_ALREADY_EXISTS(
+            "CND_008",
+            "CANDIDATE_RELATION_ALREADY_EXISTS",
+            409,
+            "This relation already exists for the candidate."
     );
 
     private final String code;

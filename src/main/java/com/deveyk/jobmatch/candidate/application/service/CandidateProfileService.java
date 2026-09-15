@@ -1,8 +1,8 @@
 package com.deveyk.jobmatch.candidate.application.service;
 
 import com.deveyk.jobmatch.candidate.application.port.in.CandidateProfileUseCase;
-import com.deveyk.jobmatch.candidate.application.port.in.CreateCandidateProfileCommand;
-import com.deveyk.jobmatch.candidate.application.port.in.UpdateCandidateProfileCommand;
+import com.deveyk.jobmatch.candidate.application.port.in.command.CreateCandidateProfileCommand;
+import com.deveyk.jobmatch.candidate.application.port.in.command.UpdateCandidateProfileCommand;
 import com.deveyk.jobmatch.candidate.application.port.out.CandidateRepository;
 import com.deveyk.jobmatch.candidate.domain.exception.CandidateAlreadyExistsException;
 import com.deveyk.jobmatch.candidate.domain.exception.CandidateNotFoundException;

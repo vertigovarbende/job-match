@@ -47,6 +47,8 @@
 - [ ] Candidate profile
 - [ ] Skills
 - [ ] Experiences
+- [ ] Certifications
+- [ ] Languages
 - [ ] Company profile
 - [ ] Employer-company membership
 - [ ] Company verification
@@ -74,6 +76,7 @@
 - [ ] Highlighting
 - [ ] Autocomplete
 - [ ] Fuzzy search
+- [ ] Candidate search index (employer'ların adayları skill/experience/location'a göre arayabilmesi) — ertelendi, somut bir "candidate search" özelliği talebi çıkarsa değerlendirilecek; uygulanırsa Experience/Education/Certification/CandidateSkill/CandidateLanguage değişiklikleri candidate.events.v1 (bkz. EVENTS.md) üzerinden bu index'e senkronize edilir (candidate-skills tasarım sürecinde gündeme geldi, bkz. CANDIDATE_SKILLS.md)
 
 ## Phase 5 — Kafka & Outbox
 
@@ -104,6 +107,7 @@
 - [ ] Salary score
 - [ ] Explainable score breakdown
 - [ ] Recommended jobs endpoint
+- [ ] Event-driven skor yeniden hesaplama (CandidateSkillAttached/ExperienceAdded vb. event'lerle Phase 8'in cache'inde "recommended jobs" sonuçlarını arka planda invalidate/yeniden hesapla) — ertelendi, skorların senkron mu event-driven mi hesaplanacağına henüz karar verilmedi, somut bir performans problemi çıkarsa değerlendirilecek (candidate-skills tasarım sürecinde gündeme geldi, bkz. CANDIDATE_SKILLS.md)
 
 ## Phase 8 — Redis
 
