@@ -1,4 +1,3 @@
-// EducationPersistenceMapper.java
 package com.deveyk.jobmatch.candidate.infrastructure.persistence.mapper;
 
 import com.deveyk.jobmatch.candidate.domain.model.Education;
