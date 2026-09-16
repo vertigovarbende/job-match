@@ -1,4 +1,4 @@
-package com.deveyk.jobmatch.company.domain.repository;
+package com.deveyk.jobmatch.company.application.port.out;
 
 import com.deveyk.jobmatch.company.domain.model.Company;
 

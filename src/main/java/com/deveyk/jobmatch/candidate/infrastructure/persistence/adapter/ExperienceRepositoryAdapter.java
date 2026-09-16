@@ -1,4 +1,3 @@
-// ExperienceRepositoryAdapter.java
 package com.deveyk.jobmatch.candidate.infrastructure.persistence.adapter;
 
 import com.deveyk.jobmatch.candidate.application.port.out.ExperienceRepository;

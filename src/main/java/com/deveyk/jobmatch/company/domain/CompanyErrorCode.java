@@ -29,6 +29,20 @@ public enum CompanyErrorCode implements ErrorCode {
             "COMPANY_FIELD_INVALID",
             400,
             "A required company profile field is missing or invalid."
+    ),
+
+    COMPANY_MEMBERSHIP_ALREADY_EXISTS(
+            "CMP_004",
+            "COMPANY_MEMBERSHIP_ALREADY_EXISTS",
+            409,
+            "This employer already belongs to a company."
+    ),
+
+    COMPANY_MEMBERSHIP_NOT_FOUND(
+            "CMP_005",
+            "COMPANY_MEMBERSHIP_NOT_FOUND",
+            404,
+            "No company membership found for the given company and user."
     );
 
     private final String code;

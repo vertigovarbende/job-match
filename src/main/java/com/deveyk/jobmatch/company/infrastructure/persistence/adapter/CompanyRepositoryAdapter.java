@@ -1,7 +1,7 @@
 package com.deveyk.jobmatch.company.infrastructure.persistence.adapter;
 
+import com.deveyk.jobmatch.company.application.port.out.CompanyRepository;
 import com.deveyk.jobmatch.company.domain.model.Company;
-import com.deveyk.jobmatch.company.domain.repository.CompanyRepository;
 import com.deveyk.jobmatch.company.infrastructure.persistence.entity.CompanyEntity;
 import com.deveyk.jobmatch.company.infrastructure.persistence.mapper.CompanyPersistenceMapper;
 import com.deveyk.jobmatch.company.infrastructure.persistence.repository.SpringDataCompanyJpaRepository;
