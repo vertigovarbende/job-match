@@ -2,11 +2,11 @@ package com.deveyk.jobmatch.candidate.infrastructure.persistence.mapper;
 
 import com.deveyk.jobmatch.candidate.domain.WorkplaceType;
 import com.deveyk.jobmatch.candidate.domain.model.Candidate;
-import com.deveyk.jobmatch.candidate.domain.model.Location;
 import com.deveyk.jobmatch.candidate.domain.model.Money;
 import com.deveyk.jobmatch.candidate.domain.model.SalaryRange;
 import com.deveyk.jobmatch.candidate.domain.model.WorkplacePreferences;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.entity.CandidateEntity;
+import com.deveyk.jobmatch.shared.domain.model.Location;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

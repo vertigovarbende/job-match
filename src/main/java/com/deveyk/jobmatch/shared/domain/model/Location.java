@@ -1,6 +1,6 @@
-package com.deveyk.jobmatch.candidate.domain.model;
+package com.deveyk.jobmatch.shared.domain.model;
 
-import com.deveyk.jobmatch.candidate.domain.exception.CandidateFieldInvalidException;
+import com.deveyk.jobmatch.shared.domain.exception.FieldInvalidException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -14,11 +14,11 @@ public final class Location {
     public Location(final String country, final String city) {
 
         if (country == null || country.isBlank()) {
-            throw new CandidateFieldInvalidException("country", "must not be blank");
+            throw new FieldInvalidException("country", "must not be blank");
         }
 
         if (city == null || city.isBlank()) {
-            throw new CandidateFieldInvalidException("city", "must not be blank");
+            throw new FieldInvalidException("city", "must not be blank");
         }
 
         this.country = country;
