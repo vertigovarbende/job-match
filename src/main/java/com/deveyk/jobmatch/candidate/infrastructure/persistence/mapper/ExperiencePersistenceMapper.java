@@ -2,8 +2,8 @@
 package com.deveyk.jobmatch.candidate.infrastructure.persistence.mapper;
 
 import com.deveyk.jobmatch.candidate.domain.model.Experience;
-import com.deveyk.jobmatch.candidate.domain.model.Location;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.entity.ExperienceEntity;
+import com.deveyk.jobmatch.shared.domain.model.Location;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
