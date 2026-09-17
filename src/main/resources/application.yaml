@@ -6,3 +6,8 @@ spring:
 
 server:
   port: ${SERVER_PORT}
+
+jobmatch:
+  job:
+    expiry-scheduler:
+      cron: "0 */15 * * * *"

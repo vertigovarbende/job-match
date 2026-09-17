@@ -1,6 +1,6 @@
-package com.deveyk.jobmatch.candidate.domain.model;
+package com.deveyk.jobmatch.shared.domain.model;
 
-import com.deveyk.jobmatch.candidate.domain.exception.CandidateFieldInvalidException;
+import com.deveyk.jobmatch.shared.domain.exception.FieldInvalidException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -16,15 +16,15 @@ public final class Money {
     public Money(final BigDecimal amount, final String currency) {
 
         if (amount == null) {
-            throw new CandidateFieldInvalidException("amount", "must not be null");
+            throw new FieldInvalidException("amount", "must not be null");
         }
 
         if (amount.signum() < 0) {
-            throw new CandidateFieldInvalidException("amount", "must not be negative");
+            throw new FieldInvalidException("amount", "must not be negative");
         }
 
         if (currency == null || currency.isBlank()) {
-            throw new CandidateFieldInvalidException("currency");
+            throw new FieldInvalidException("currency");
         }
 
         this.amount = amount;

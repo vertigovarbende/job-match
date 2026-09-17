@@ -1,6 +1,6 @@
 package com.deveyk.jobmatch.candidate.presentation.rest.response;
 
-import com.deveyk.jobmatch.candidate.domain.WorkplaceType;
+import com.deveyk.jobmatch.shared.domain.WorkplaceType;
 
 import java.util.Set;
 

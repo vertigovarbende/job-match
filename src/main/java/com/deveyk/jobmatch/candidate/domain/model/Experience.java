@@ -1,6 +1,6 @@
 package com.deveyk.jobmatch.candidate.domain.model;
 
-import com.deveyk.jobmatch.candidate.domain.EmploymentType;
+import com.deveyk.jobmatch.shared.domain.EmploymentType;
 import com.deveyk.jobmatch.candidate.domain.exception.CandidateFieldInvalidException;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
 import com.deveyk.jobmatch.shared.domain.model.Location;

@@ -14,6 +14,13 @@ public enum SharedErrorCode implements ErrorCode {
             "FIELD_INVALID",
             400,
             "A required field is missing or invalid."
+    ),
+
+    INVALID_SALARY_RANGE(
+            "SHR_002",
+            "INVALID_SALARY_RANGE",
+            422,
+            "Salary range minimum must not exceed maximum."
     );
 
     private final String code;

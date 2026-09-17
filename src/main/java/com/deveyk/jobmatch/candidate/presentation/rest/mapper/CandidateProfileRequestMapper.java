@@ -2,8 +2,8 @@ package com.deveyk.jobmatch.candidate.presentation.rest.mapper;
 
 import com.deveyk.jobmatch.candidate.application.port.in.command.CreateCandidateProfileCommand;
 import com.deveyk.jobmatch.candidate.application.port.in.command.UpdateCandidateProfileCommand;
-import com.deveyk.jobmatch.candidate.domain.model.Money;
-import com.deveyk.jobmatch.candidate.domain.model.SalaryRange;
+import com.deveyk.jobmatch.shared.domain.model.Money;
+import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
 import com.deveyk.jobmatch.candidate.domain.model.WorkplacePreferences;
 import com.deveyk.jobmatch.candidate.presentation.rest.request.MoneyRequest;
 import com.deveyk.jobmatch.candidate.presentation.rest.request.SalaryRangeRequest;

@@ -1,6 +1,6 @@
 package com.deveyk.jobmatch.candidate.domain.model;
 
-import com.deveyk.jobmatch.candidate.domain.WorkplaceType;
+import com.deveyk.jobmatch.shared.domain.WorkplaceType;
 import com.deveyk.jobmatch.candidate.domain.exception.CandidateFieldInvalidException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

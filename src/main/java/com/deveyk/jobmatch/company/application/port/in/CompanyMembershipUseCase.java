@@ -5,6 +5,7 @@ import com.deveyk.jobmatch.company.application.port.in.command.RemoveCompanyMemb
 import com.deveyk.jobmatch.company.domain.model.CompanyMembership;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CompanyMembershipUseCase {
 
@@ -13,5 +14,7 @@ public interface CompanyMembershipUseCase {
     void removeMember(RemoveCompanyMembershipCommand command);
 
     List<CompanyMembership> listMembers(Long companyId);
+
+    Optional<CompanyMembership> findMembershipByUserId(Long userId);
 
 }
