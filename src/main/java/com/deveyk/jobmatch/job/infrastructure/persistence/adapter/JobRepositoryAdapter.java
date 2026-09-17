@@ -1,5 +1,7 @@
 package com.deveyk.jobmatch.job.infrastructure.persistence.adapter;
 
+import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
+import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
 import com.deveyk.jobmatch.job.domain.JobSkillType;
 import com.deveyk.jobmatch.job.domain.exception.DuplicateSkillReferenceException;
@@ -8,13 +10,18 @@ import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.domain.model.JobStatusType;
 import com.deveyk.jobmatch.job.infrastructure.persistence.entity.JobEntity;
 import com.deveyk.jobmatch.job.infrastructure.persistence.entity.JobSkillEntity;
+import com.deveyk.jobmatch.job.infrastructure.persistence.filter.JobListFilter;
+import com.deveyk.jobmatch.job.infrastructure.persistence.filter.JobSearchFilter;
 import com.deveyk.jobmatch.job.infrastructure.persistence.mapper.JobPersistenceMapper;
 import com.deveyk.jobmatch.job.infrastructure.persistence.repository.SpringDataJobJpaRepository;
 import com.deveyk.jobmatch.job.infrastructure.persistence.repository.SpringDataJobSkillJpaRepository;
+import com.deveyk.jobmatch.shared.domain.model.JmPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -59,6 +66,56 @@ public class JobRepositoryAdapter implements JobRepository {
         return this.springDataJobJpaRepository.findAllByStatusAndExpiresAtBefore(status, cutoff).stream()
                 .map(this::toDomainWithSkills)
                 .toList();
+    }
+
+    @Override
+    public JmPage<Job> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
+
+        final JobSearchFilter filter = JobSearchFilter.builder()
+                .title(criteria.title())
+                .seniority(criteria.seniority())
+                .employmentType(criteria.employmentType())
+                .workplaceType(criteria.workplaceType())
+                .locationCountry(criteria.locationCountry())
+                .locationCity(criteria.locationCity())
+                .salaryMin(criteria.salaryMin())
+                .skillIds(criteria.skillIds())
+                .build();
+
+        final Page<JobEntity> page = this.springDataJobJpaRepository.findAll(filter.toSpecification(), pageable);
+
+        final var content = page.getContent().stream()
+                .map(this::toDomainWithSkills)
+                .toList();
+
+        return JmPage.of(filter, page, content);
+
+    }
+
+    @Override
+    public JmPage<Job> findAllForCompany(final Long companyId, final JobListCriteria criteria, final Pageable pageable) {
+
+        final JobListFilter filter = JobListFilter.builder()
+                .companyId(companyId)
+                .status(criteria.status())
+                .title(criteria.title())
+                .seniority(criteria.seniority())
+                .employmentType(criteria.employmentType())
+                .workplaceType(criteria.workplaceType())
+                .locationCountry(criteria.locationCountry())
+                .locationCity(criteria.locationCity())
+                .salaryMin(criteria.salaryMin())
+                .skillIds(criteria.skillIds())
+                .build();
+
+        final Page<JobEntity> page = this.springDataJobJpaRepository.findAll(filter.toSpecification(), pageable);
+
+        final var content = page.getContent().stream()
+                .map(this::toDomainWithSkills)
+                .toList();
+
+        return JmPage.of(filter, page, content);
+
     }
 
     private Job toDomainWithSkills(final JobEntity entity) {

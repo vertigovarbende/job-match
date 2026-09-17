@@ -1,21 +1,25 @@
-package com.deveyk.jobmatch.candidate.presentation.rest.mapper;
+package com.deveyk.jobmatch.job.presentation.rest.mapper;
 
-import com.deveyk.jobmatch.candidate.domain.model.Candidate;
+import com.deveyk.jobmatch.job.domain.model.Job;
+import com.deveyk.jobmatch.job.domain.model.JobStatus;
+import com.deveyk.jobmatch.job.domain.model.JobStatusType;
+import com.deveyk.jobmatch.job.presentation.rest.response.JobResponse;
+import com.deveyk.jobmatch.shared.domain.model.Location;
 import com.deveyk.jobmatch.shared.domain.model.Money;
 import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
-import com.deveyk.jobmatch.candidate.domain.model.WorkplacePreferences;
-import com.deveyk.jobmatch.candidate.presentation.rest.response.CandidateResponse;
+import com.deveyk.jobmatch.shared.presentation.rest.response.LocationResponse;
 import com.deveyk.jobmatch.shared.presentation.rest.response.MoneyResponse;
 import com.deveyk.jobmatch.shared.presentation.rest.response.SalaryRangeResponse;
-import com.deveyk.jobmatch.candidate.presentation.rest.response.WorkplacePreferencesResponse;
-import com.deveyk.jobmatch.shared.domain.model.Location;
-import com.deveyk.jobmatch.shared.presentation.rest.response.LocationResponse;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
-public interface CandidateProfileResponseMapper {
+import java.util.List;
 
-    CandidateResponse toResponse(Candidate candidate);
+@Mapper(componentModel = "spring")
+public interface JobResponseMapper {
+
+    JobResponse toResponse(Job job);
+
+    List<JobResponse> toResponseList(List<Job> jobs);
 
     default LocationResponse toLocationResponse(final Location location) {
         if (location == null) {
@@ -41,12 +45,8 @@ public interface CandidateProfileResponseMapper {
         return new SalaryRangeResponse(this.toMoneyResponse(salaryRange.getMin()), this.toMoneyResponse(salaryRange.getMax()));
     }
 
-    default WorkplacePreferencesResponse toWorkplacePreferencesResponse(final WorkplacePreferences workplacePreferences) {
-        if (workplacePreferences == null) {
-            return null;
-        }
-
-        return new WorkplacePreferencesResponse(workplacePreferences.getAcceptedTypes());
+    default JobStatusType toStatusType(final JobStatus status) {
+        return status == null ? null : status.type();
     }
 
 }

@@ -1,4 +1,4 @@
-package com.deveyk.jobmatch.candidate.presentation.rest.request;
+package com.deveyk.jobmatch.shared.presentation.rest.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

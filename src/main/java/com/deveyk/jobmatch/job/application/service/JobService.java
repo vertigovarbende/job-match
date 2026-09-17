@@ -7,6 +7,8 @@ import com.deveyk.jobmatch.job.application.port.in.command.CloseJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.CreateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.PublishJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.UpdateJobCommand;
+import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
+import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
 import com.deveyk.jobmatch.job.domain.event.JobArchivedEvent;
 import com.deveyk.jobmatch.job.domain.event.JobClosedEvent;
@@ -15,9 +17,11 @@ import com.deveyk.jobmatch.job.domain.event.JobPublishedEvent;
 import com.deveyk.jobmatch.job.domain.exception.CompanyMembershipRequiredException;
 import com.deveyk.jobmatch.job.domain.exception.JobNotFoundException;
 import com.deveyk.jobmatch.job.domain.model.Job;
+import com.deveyk.jobmatch.shared.domain.model.JmPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -172,6 +176,27 @@ public class JobService implements JobUseCase {
         log.info("Job expired: jobId={}", saved.getId());
 
         return saved;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public JmPage<Job> searchPublishedJobs(final JobSearchCriteria criteria, final Pageable pageable) {
+
+        log.debug("Searching published jobs");
+
+        return this.jobRepository.findAllPublished(criteria, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public JmPage<Job> listMyJobs(final JobListCriteria criteria, final Pageable pageable) {
+
+        final Long companyId = this.currentCompanyFacade.resolveCurrentCompanyId()
+                .orElseThrow(CompanyMembershipRequiredException::new);
+
+        log.debug("Listing jobs: companyId={}", companyId);
+
+        return this.jobRepository.findAllForCompany(companyId, criteria, pageable);
     }
 
     private Job findByIdOrThrow(final Long id) {

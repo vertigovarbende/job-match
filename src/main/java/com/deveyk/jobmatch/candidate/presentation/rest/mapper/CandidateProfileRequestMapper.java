@@ -5,8 +5,8 @@ import com.deveyk.jobmatch.candidate.application.port.in.command.UpdateCandidate
 import com.deveyk.jobmatch.shared.domain.model.Money;
 import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
 import com.deveyk.jobmatch.candidate.domain.model.WorkplacePreferences;
-import com.deveyk.jobmatch.candidate.presentation.rest.request.MoneyRequest;
-import com.deveyk.jobmatch.candidate.presentation.rest.request.SalaryRangeRequest;
+import com.deveyk.jobmatch.shared.presentation.rest.request.MoneyRequest;
+import com.deveyk.jobmatch.shared.presentation.rest.request.SalaryRangeRequest;
 import com.deveyk.jobmatch.candidate.presentation.rest.request.UpdateCandidateProfileRequest;
 import com.deveyk.jobmatch.candidate.presentation.rest.request.WorkplacePreferencesRequest;
 import com.deveyk.jobmatch.identity.domain.Role;

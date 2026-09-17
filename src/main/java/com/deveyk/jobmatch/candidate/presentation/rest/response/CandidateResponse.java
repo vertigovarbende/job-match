@@ -1,6 +1,7 @@
 package com.deveyk.jobmatch.candidate.presentation.rest.response;
 
 import com.deveyk.jobmatch.shared.presentation.rest.response.LocationResponse;
+import com.deveyk.jobmatch.shared.presentation.rest.response.SalaryRangeResponse;
 
 public record CandidateResponse(
         Long id,
