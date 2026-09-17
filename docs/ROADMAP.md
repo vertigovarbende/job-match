@@ -1,5 +1,7 @@
 # Roadmap
 
+> **Not (use-case derinliği):** Faz 3 (Job -- Chain of Responsibility, Protection Proxy, State), Faz 6 (Applications -- State) ve Faz 7 (Matching -- Strategy), projenin bilinçli olarak "derin use-case" fazları olarak seçildi; bkz. DESIGN_PATTERNS.md, ADR-012.
+
 ## Phase 0 — Foundation
 
 - [ ] Repository setup (GitHub repo idaresi: branch protection, PR template vb. — bkz. CONTRIBUTING.md)
@@ -66,6 +68,7 @@
 - [ ] Close
 - [ ] Archive
   - [ ] Audit entegrasyonu: publish/close/archive event'leri (bkz. AUDIT.md)
+- [ ] EXPIRED geçişi için zamanlanmış görev (`@Scheduled`, bkz. JOB.md madde 6)
 - [ ] Ownership authorization
 - [ ] Job REST API için Spring Cloud Contract (Groovy DSL) contract testleri
 

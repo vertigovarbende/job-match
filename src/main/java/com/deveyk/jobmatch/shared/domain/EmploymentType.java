@@ -1,4 +1,4 @@
-package com.deveyk.jobmatch.candidate.domain;
+package com.deveyk.jobmatch.shared.domain;
 
 public enum EmploymentType {
 

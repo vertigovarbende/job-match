@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -74,6 +75,15 @@ public class CompanyMembershipService implements CompanyMembershipUseCase {
         log.debug("Listing company members: companyId={}", companyId);
 
         return this.companyMembershipRepository.findAllByCompanyId(companyId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<CompanyMembership> findMembershipByUserId(final Long userId) {
+
+        log.debug("Finding company membership: userId={}", userId);
+
+        return this.companyMembershipRepository.findByUserId(userId);
     }
 
 }

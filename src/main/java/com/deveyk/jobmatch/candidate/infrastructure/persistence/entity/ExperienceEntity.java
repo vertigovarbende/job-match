@@ -1,7 +1,7 @@
 // ExperienceEntity.java
 package com.deveyk.jobmatch.candidate.infrastructure.persistence.entity;
 
-import com.deveyk.jobmatch.candidate.domain.EmploymentType;
+import com.deveyk.jobmatch.shared.domain.EmploymentType;
 import com.deveyk.jobmatch.shared.infrastructure.persistence.entity.JmBaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

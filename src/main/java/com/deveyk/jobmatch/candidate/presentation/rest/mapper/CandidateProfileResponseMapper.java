@@ -1,8 +1,8 @@
 package com.deveyk.jobmatch.candidate.presentation.rest.mapper;
 
 import com.deveyk.jobmatch.candidate.domain.model.Candidate;
-import com.deveyk.jobmatch.candidate.domain.model.Money;
-import com.deveyk.jobmatch.candidate.domain.model.SalaryRange;
+import com.deveyk.jobmatch.shared.domain.model.Money;
+import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
 import com.deveyk.jobmatch.candidate.domain.model.WorkplacePreferences;
 import com.deveyk.jobmatch.candidate.presentation.rest.response.CandidateResponse;
 import com.deveyk.jobmatch.candidate.presentation.rest.response.MoneyResponse;

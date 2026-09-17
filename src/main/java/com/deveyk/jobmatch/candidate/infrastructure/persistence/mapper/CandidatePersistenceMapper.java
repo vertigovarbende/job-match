@@ -1,9 +1,9 @@
 package com.deveyk.jobmatch.candidate.infrastructure.persistence.mapper;
 
-import com.deveyk.jobmatch.candidate.domain.WorkplaceType;
+import com.deveyk.jobmatch.shared.domain.WorkplaceType;
 import com.deveyk.jobmatch.candidate.domain.model.Candidate;
-import com.deveyk.jobmatch.candidate.domain.model.Money;
-import com.deveyk.jobmatch.candidate.domain.model.SalaryRange;
+import com.deveyk.jobmatch.shared.domain.model.Money;
+import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
 import com.deveyk.jobmatch.candidate.domain.model.WorkplacePreferences;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.entity.CandidateEntity;
 import com.deveyk.jobmatch.shared.domain.model.Location;

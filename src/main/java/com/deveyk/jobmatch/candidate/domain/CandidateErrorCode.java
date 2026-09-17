@@ -31,13 +31,6 @@ public enum CandidateErrorCode implements ErrorCode {
             "Only users with the CANDIDATE role can own a candidate profile."
     ),
 
-    INVALID_SALARY_RANGE(
-            "CND_004",
-            "INVALID_SALARY_RANGE",
-            422,
-            "Desired salary range minimum must not exceed maximum."
-    ),
-
     CANDIDATE_FIELD_INVALID(
             "CND_005",
             "CANDIDATE_FIELD_INVALID",

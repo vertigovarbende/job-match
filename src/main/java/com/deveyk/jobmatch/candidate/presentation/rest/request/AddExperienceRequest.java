@@ -1,6 +1,6 @@
 package com.deveyk.jobmatch.candidate.presentation.rest.request;
 
-import com.deveyk.jobmatch.candidate.domain.EmploymentType;
+import com.deveyk.jobmatch.shared.domain.EmploymentType;
 import com.deveyk.jobmatch.shared.presentation.rest.request.LocationRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
