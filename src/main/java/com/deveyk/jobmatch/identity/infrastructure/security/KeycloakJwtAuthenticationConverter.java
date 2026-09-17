@@ -1,6 +1,8 @@
 package com.deveyk.jobmatch.identity.infrastructure.security;
 
 import com.deveyk.jobmatch.identity.domain.Role;
+import com.deveyk.jobmatch.identity.domain.exception.InvalidBusinessRoleClaimException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,16 +14,30 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+
 @Component
+@RequiredArgsConstructor
 public class KeycloakJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private static final String ROLE_AUTHORITY_PREFIX = "ROLE_";
     private static final String PREFERRED_USERNAME_CLAIM = "preferred_username";
 
+    private final JwtClaimsExtractor jwtClaimsExtractor;
+
     @Override
     public AbstractAuthenticationToken convert(final Jwt jwt) {
         final Collection<GrantedAuthority> authorities = extractRealmRoles(jwt);
-        return new JwtAuthenticationToken(jwt, authorities, extractPrincipalName(jwt));
+        final JwtAuthenticationToken token = new JwtAuthenticationToken(jwt, authorities, extractPrincipalName(jwt));
+        token.setDetails(extractClaimsOrException(jwt));
+        return token;
+    }
+
+    private Object extractClaimsOrException(final Jwt jwt) {
+        try {
+            return this.jwtClaimsExtractor.extract(jwt);
+        } catch (InvalidBusinessRoleClaimException exception) {
+            return exception;
+        }
     }
 
     private Collection<GrantedAuthority> extractRealmRoles(final Jwt jwt) {

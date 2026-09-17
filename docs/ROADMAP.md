@@ -44,15 +44,19 @@
 
 ## Phase 2 — Candidate & Company
 
-- [ ] Candidate profile
-- [ ] Skills
-- [ ] Experiences
-- [ ] Certifications
-- [ ] Languages
-- [ ] Company profile
-- [ ] Employer-company membership
-- [ ] Company verification
-  - [ ] Audit entegrasyonu: verification, çalışan ekleme/çıkarma (bkz. AUDIT.md)
+> **Not (branch sıralama kararı):** Candidate ve Company maddeleri, identity/audit'in izlediği bottom-up yaklaşımla (domain → persistence → application) ayrı branch'lerde ilerliyor; REST katmanı bu maddelerin kapsamı dışında tutuluyor. Sıralama: candidate-profile → candidate-skills → company-profile → company-membership (dördü de tamamlandı, REST'siz; "Company verification" ayrı bir branch olarak açılmadı, company-profile'a gömüldü -- bkz. COMPANY.md) → REST (candidate + company, tek/ardışık bir aşamada, DTO/controller konvansiyonu bir kerede netleştirilir) → Phase 2 testleri (bkz. CANDIDATE_SKILLS.md'deki ertelenmiş test kararıyla aynı mantık). Bu yüzden aşağıdaki maddeler yalnızca domain/persistence/application tamamlandığında değil, REST katmanı da dahil tam bittiğinde işaretlenecek; ara ilerleme ilgili modülün kendi docs/*.md dosyasında izlenir.
+>
+> **Güncelleme:** yukarıdaki sıralama başlangıçta yalnızca candidate-profile → candidate-skills → company-profile → REST olarak yazılmıştı; company-membership branch'i o sırada henüz kararlaştırılmamıştı, sonradan ayrı bir branch olarak eklendi (bkz. COMPANY.md'nin "Employer-company membership tamamen bu branch'in dışında" notu ve COMPANY_MEMBERSHIP.md) ve tamamlandı. Bu not, gerçekleşen sırayı yansıtacak şekilde güncellendi.
+
+- [x] Candidate profile
+- [x] Skills
+- [x] Experiences
+- [x] Certifications
+- [x] Languages
+- [x] Company profile
+- [x] Employer-company membership
+- [x] Company verification
+  - [x] Audit entegrasyonu: verification, çalışan ekleme/çıkarma (bkz. AUDIT.md)
 
 ## Phase 3 — Job Management
 
