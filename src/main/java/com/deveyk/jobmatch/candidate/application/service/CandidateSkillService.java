@@ -1,4 +1,3 @@
-// CandidateSkillService.java
 package com.deveyk.jobmatch.candidate.application.service;
 
 import com.deveyk.jobmatch.candidate.application.port.in.command.AttachCandidateSkillCommand;

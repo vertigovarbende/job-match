@@ -1,11 +1,11 @@
 package com.deveyk.jobmatch.catalog.application.port.out;
 
 import com.deveyk.jobmatch.catalog.domain.model.Skill;
-
-import java.util.List;
+import com.deveyk.jobmatch.shared.domain.model.JmPage;
+import org.springframework.data.domain.Pageable;
 
 public interface SkillRepository {
 
-    List<Skill> findAll();
+    JmPage<Skill> findAll(String name, Pageable pageable);
 
 }

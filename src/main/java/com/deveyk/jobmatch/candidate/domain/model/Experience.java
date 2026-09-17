@@ -3,6 +3,7 @@ package com.deveyk.jobmatch.candidate.domain.model;
 import com.deveyk.jobmatch.candidate.domain.EmploymentType;
 import com.deveyk.jobmatch.candidate.domain.exception.CandidateFieldInvalidException;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
+import com.deveyk.jobmatch.shared.domain.model.Location;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
