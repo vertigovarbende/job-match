@@ -1,4 +1,4 @@
-package com.deveyk.jobmatch.candidate.presentation.rest.response;
+package com.deveyk.jobmatch.shared.presentation.rest.response;
 
 import java.math.BigDecimal;
 

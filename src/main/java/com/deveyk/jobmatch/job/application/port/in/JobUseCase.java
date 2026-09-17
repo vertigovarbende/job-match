@@ -5,7 +5,11 @@ import com.deveyk.jobmatch.job.application.port.in.command.CloseJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.CreateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.PublishJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.UpdateJobCommand;
+import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
+import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
 import com.deveyk.jobmatch.job.domain.model.Job;
+import com.deveyk.jobmatch.shared.domain.model.JmPage;
+import org.springframework.data.domain.Pageable;
 
 public interface JobUseCase {
 
@@ -22,5 +26,9 @@ public interface JobUseCase {
     Job archiveJob(ArchiveJobCommand command);
 
     Job expireJob(Long jobId);
+
+    JmPage<Job> searchPublishedJobs(JobSearchCriteria criteria, Pageable pageable);
+
+    JmPage<Job> listMyJobs(JobListCriteria criteria, Pageable pageable);
 
 }
