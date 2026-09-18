@@ -3,11 +3,13 @@ package com.deveyk.jobmatch.job.domain.event;
 import com.deveyk.jobmatch.audit.domain.AuditAction;
 import com.deveyk.jobmatch.audit.domain.event.AuditableDomainEvent;
 import com.deveyk.jobmatch.job.domain.JobAuditAction;
+import com.deveyk.jobmatch.search.domain.event.IndexOperation;
+import com.deveyk.jobmatch.search.domain.event.SearchIndexableEvent;
 
 import java.time.Instant;
 import java.util.Map;
 
-public record JobExpiredEvent(String targetId, Instant occurredAt) implements AuditableDomainEvent {
+public record JobExpiredEvent(String targetId, Instant occurredAt) implements AuditableDomainEvent, SearchIndexableEvent {
 
     public JobExpiredEvent(final String targetId) {
         this(targetId, Instant.now());
@@ -26,6 +28,11 @@ public record JobExpiredEvent(String targetId, Instant occurredAt) implements Au
     @Override
     public String targetType() {
         return "JOB";
+    }
+
+    @Override
+    public IndexOperation operation() {
+        return IndexOperation.DELETE;
     }
 
     @Override

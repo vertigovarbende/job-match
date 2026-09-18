@@ -8,10 +8,10 @@ import com.deveyk.jobmatch.job.domain.exception.DuplicateSkillReferenceException
 import com.deveyk.jobmatch.job.domain.exception.JobFieldInvalidException;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.domain.model.JobStatusType;
+import com.deveyk.jobmatch.job.infrastructure.elasticsearch.adapter.JobSearchQueryAdapter;
 import com.deveyk.jobmatch.job.infrastructure.persistence.entity.JobEntity;
 import com.deveyk.jobmatch.job.infrastructure.persistence.entity.JobSkillEntity;
 import com.deveyk.jobmatch.job.infrastructure.persistence.filter.JobListFilter;
-import com.deveyk.jobmatch.job.infrastructure.persistence.filter.JobSearchFilter;
 import com.deveyk.jobmatch.job.infrastructure.persistence.mapper.JobPersistenceMapper;
 import com.deveyk.jobmatch.job.infrastructure.persistence.repository.SpringDataJobJpaRepository;
 import com.deveyk.jobmatch.job.infrastructure.persistence.repository.SpringDataJobSkillJpaRepository;
@@ -42,6 +42,7 @@ public class JobRepositoryAdapter implements JobRepository {
     private final SpringDataJobJpaRepository springDataJobJpaRepository;
     private final SpringDataJobSkillJpaRepository springDataJobSkillJpaRepository;
     private final JobPersistenceMapper jobPersistenceMapper;
+    private final JobSearchQueryAdapter jobSearchQueryAdapter;
 
     @Override
     public Optional<Job> findById(final Long id) {
@@ -70,26 +71,7 @@ public class JobRepositoryAdapter implements JobRepository {
 
     @Override
     public JmPage<Job> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
-
-        final JobSearchFilter filter = JobSearchFilter.builder()
-                .title(criteria.title())
-                .seniority(criteria.seniority())
-                .employmentType(criteria.employmentType())
-                .workplaceType(criteria.workplaceType())
-                .locationCountry(criteria.locationCountry())
-                .locationCity(criteria.locationCity())
-                .salaryMin(criteria.salaryMin())
-                .skillIds(criteria.skillIds())
-                .build();
-
-        final Page<JobEntity> page = this.springDataJobJpaRepository.findAll(filter.toSpecification(), pageable);
-
-        final var content = page.getContent().stream()
-                .map(this::toDomainWithSkills)
-                .toList();
-
-        return JmPage.of(filter, page, content);
-
+        return this.jobSearchQueryAdapter.findAllPublished(criteria, pageable);
     }
 
     @Override

@@ -40,8 +40,29 @@ services:
     ports:
       - "${MAILPIT_UI_PORT}:8025"
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.4.6
+    container_name: jobmatch-elasticsearch
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "${ELASTICSEARCH_PORT}:9200"
+    volumes:
+      - jobmatch-elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fs 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
 volumes:
   jobmatch-postgresql-data:
     name: jobmatch-postgresql-data
   jobmatch-keycloak-data:
     name: jobmatch-keycloak-data
+  jobmatch-elasticsearch-data:
+    name: jobmatch-elasticsearch-data
