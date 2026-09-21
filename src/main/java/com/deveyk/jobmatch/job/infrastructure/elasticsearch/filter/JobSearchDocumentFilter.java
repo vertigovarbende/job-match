@@ -19,7 +19,7 @@ import java.util.Set;
 @Builder
 public class JobSearchDocumentFilter implements JmSearchFilter<JobDocument> {
 
-    private final String title;
+    private final String q;
     private final Seniority seniority;
     private final EmploymentType employmentType;
     private final WorkplaceType workplaceType;
@@ -33,8 +33,10 @@ public class JobSearchDocumentFilter implements JmSearchFilter<JobDocument> {
 
         Criteria criteria = new Criteria("status").is(JobStatusType.PUBLISHED.name());
 
-        if (this.title != null && !this.title.isBlank()) {
-            criteria = criteria.and(new Criteria("title").matches(this.title));
+        if (this.q != null && !this.q.isBlank()) {
+            criteria = criteria.and(Criteria.or()
+                    .or(new Criteria("title").matches(this.q))
+                    .or(new Criteria("description").matches(this.q)));
         }
 
         if (this.seniority != null) {

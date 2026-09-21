@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 public record JobSearchCriteria(
-        String title,
+        String q,
         Seniority seniority,
         EmploymentType employmentType,
         WorkplaceType workplaceType,

@@ -28,7 +28,7 @@ public class JobSearchQueryAdapter {
     public JmPage<Job> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
 
         final JobSearchDocumentFilter filter = JobSearchDocumentFilter.builder()
-                .title(criteria.title())
+                .q(criteria.q())
                 .seniority(criteria.seniority())
                 .employmentType(criteria.employmentType())
                 .workplaceType(criteria.workplaceType())
