@@ -112,7 +112,8 @@ public class JobSearchDocumentFilter implements JmSearchFilter<JobDocument> {
         return Query.of(qb -> qb.multiMatch(mm -> mm
                 .query(this.q)
                 .fields("title^5", "description^1")
-                .type(TextQueryType.BestFields)));
+                .type(TextQueryType.BestFields)
+                .fuzziness("AUTO")));
 
     }
 
