@@ -25,7 +25,7 @@ public class JobSearchRequest extends JmPagingRequest {
     private static final Set<String> ACCEPTED_ORDER_PROPERTIES = Set.of("id", "title", "publishedAt");
 
     @Size(min = 1, max = 200)
-    private String title;
+    private String q;
 
     private Seniority seniority;
 
