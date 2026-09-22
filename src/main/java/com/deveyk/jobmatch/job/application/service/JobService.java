@@ -9,6 +9,7 @@ import com.deveyk.jobmatch.job.application.port.in.command.PublishJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.UpdateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
+import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
 import com.deveyk.jobmatch.job.domain.event.JobArchivedEvent;
 import com.deveyk.jobmatch.job.domain.event.JobClosedEvent;
@@ -180,7 +181,7 @@ public class JobService implements JobUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public JmPage<Job> searchPublishedJobs(final JobSearchCriteria criteria, final Pageable pageable) {
+    public JmPage<JobSearchResult> searchPublishedJobs(final JobSearchCriteria criteria, final Pageable pageable) {
 
         log.debug("Searching published jobs");
 
