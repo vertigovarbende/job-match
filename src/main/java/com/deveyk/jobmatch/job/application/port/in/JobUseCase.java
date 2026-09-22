@@ -7,6 +7,7 @@ import com.deveyk.jobmatch.job.application.port.in.command.PublishJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.UpdateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
+import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.shared.domain.model.JmPage;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ public interface JobUseCase {
 
     Job expireJob(Long jobId);
 
-    JmPage<Job> searchPublishedJobs(JobSearchCriteria criteria, Pageable pageable);
+    JmPage<JobSearchResult> searchPublishedJobs(JobSearchCriteria criteria, Pageable pageable);
 
     JmPage<Job> listMyJobs(JobListCriteria criteria, Pageable pageable);
 

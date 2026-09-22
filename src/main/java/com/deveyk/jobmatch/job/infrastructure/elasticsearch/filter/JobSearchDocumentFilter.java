@@ -16,6 +16,9 @@ import com.deveyk.jobmatch.shared.domain.WorkplaceType;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.query.HighlightQuery;
+import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
+import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -56,9 +59,23 @@ public class JobSearchDocumentFilter implements JmSearchFilter<JobDocument> {
 
         final Query scoredQuery = Query.of(qb -> qb.functionScore(functionScoreQuery));
 
-        return NativeQuery.builder()
+        final NativeQuery nativeQuery = NativeQuery.builder()
                 .withQuery(scoredQuery)
                 .build();
+
+        if (this.q != null && !this.q.isBlank()) {
+            nativeQuery.setHighlightQuery(this.buildHighlightQuery());
+        }
+
+        return nativeQuery;
+
+    }
+
+    private HighlightQuery buildHighlightQuery() {
+
+        final Highlight highlight = new Highlight(List.of(new HighlightField("title"), new HighlightField("description")));
+
+        return new HighlightQuery(highlight, JobDocument.class);
 
     }
 

@@ -10,6 +10,7 @@ import com.deveyk.jobmatch.job.application.port.in.command.PublishJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.UpdateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
+import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.presentation.rest.mapper.JobRequestMapper;
 import com.deveyk.jobmatch.job.presentation.rest.mapper.JobResponseMapper;
@@ -109,8 +110,8 @@ public class JobController {
         }
 
         final JobSearchCriteria criteria = this.jobRequestMapper.toCriteria(request);
-        final JmPage<Job> page = this.jobUseCase.searchPublishedJobs(criteria, request.getPageable().toPageable());
-        final List<JobResponse> content = this.jobResponseMapper.toResponseList(page.getContent());
+        final JmPage<JobSearchResult> page = this.jobUseCase.searchPublishedJobs(criteria, request.getPageable().toPageable());
+        final List<JobResponse> content = this.jobResponseMapper.toResponseListFromSearchResults(page.getContent());
 
         final JmPageResponse<JobResponse> response = JmPageResponse.<JobResponse>builder()
                 .of(page, content)

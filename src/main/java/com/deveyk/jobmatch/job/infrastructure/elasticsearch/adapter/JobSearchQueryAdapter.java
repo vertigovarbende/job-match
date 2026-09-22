@@ -1,7 +1,7 @@
 package com.deveyk.jobmatch.job.infrastructure.elasticsearch.adapter;
 
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
-import com.deveyk.jobmatch.job.domain.model.Job;
+import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.infrastructure.elasticsearch.JobDocument;
 import com.deveyk.jobmatch.job.infrastructure.elasticsearch.filter.JobSearchDocumentFilter;
 import com.deveyk.jobmatch.job.infrastructure.elasticsearch.mapper.JobDocumentMapper;
@@ -25,7 +25,7 @@ public class JobSearchQueryAdapter {
     private final ElasticsearchOperations elasticsearchOperations;
     private final JobDocumentMapper jobDocumentMapper;
 
-    public JmPage<Job> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
+    public JmPage<JobSearchResult> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
 
         final JobSearchDocumentFilter filter = JobSearchDocumentFilter.builder()
                 .q(criteria.q())
@@ -44,8 +44,7 @@ public class JobSearchQueryAdapter {
         final SearchPage<JobDocument> searchPage = SearchHitSupport.searchPageFor(searchHits, pageable);
 
         final var content = searchPage.getSearchHits().getSearchHits().stream()
-                .map(SearchHit::getContent)
-                .map(this.jobDocumentMapper::toDomain)
+                .map(hit -> new JobSearchResult(this.jobDocumentMapper.toDomain(hit.getContent()), hit.getHighlightFields()))
                 .toList();
 
         log.debug("Elasticsearch job search: totalHits={}", searchHits.getTotalHits());

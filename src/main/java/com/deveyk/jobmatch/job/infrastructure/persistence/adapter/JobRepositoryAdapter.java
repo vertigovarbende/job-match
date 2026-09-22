@@ -2,6 +2,7 @@ package com.deveyk.jobmatch.job.infrastructure.persistence.adapter;
 
 import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
+import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
 import com.deveyk.jobmatch.job.domain.JobSkillType;
 import com.deveyk.jobmatch.job.domain.exception.DuplicateSkillReferenceException;
@@ -70,7 +71,7 @@ public class JobRepositoryAdapter implements JobRepository {
     }
 
     @Override
-    public JmPage<Job> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
+    public JmPage<JobSearchResult> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
         return this.jobSearchQueryAdapter.findAllPublished(criteria, pageable);
     }
 
