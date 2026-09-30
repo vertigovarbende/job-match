@@ -3,6 +3,7 @@ package com.deveyk.jobmatch.audit.unit.domain.model;
 import com.deveyk.jobmatch.audit.domain.AuditAction;
 import com.deveyk.jobmatch.audit.domain.event.AuditableDomainEvent;
 import com.deveyk.jobmatch.audit.domain.model.AuditLog;
+import com.deveyk.jobmatch.shared.domain.exception.FieldInvalidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -82,42 +83,42 @@ class AuditLogTest {
     }
 
     @Test
-    @DisplayName("from() targetType null olduğunda IllegalArgumentException fırlatır")
-    void from_throwsIllegalArgumentException_whenTargetTypeIsNull() {
+    @DisplayName("from() targetType null olduğunda FieldInvalidException fırlatır")
+    void from_throwsFieldInvalidException_whenTargetTypeIsNull() {
         final AuditableDomainEvent event = eventWith("actor-1", null, ACTION, null, "job-1", null, null, Instant.now());
 
         assertThatThrownBy(() -> AuditLog.from(event))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(FieldInvalidException.class)
                 .hasMessageContaining("targetType");
     }
 
     @Test
-    @DisplayName("from() targetType boş (blank) olduğunda IllegalArgumentException fırlatır")
-    void from_throwsIllegalArgumentException_whenTargetTypeIsBlank() {
+    @DisplayName("from() targetType boş (blank) olduğunda FieldInvalidException fırlatır")
+    void from_throwsFieldInvalidException_whenTargetTypeIsBlank() {
         final AuditableDomainEvent event = eventWith("actor-1", null, ACTION, "   ", "job-1", null, null, Instant.now());
 
         assertThatThrownBy(() -> AuditLog.from(event))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(FieldInvalidException.class)
                 .hasMessageContaining("targetType");
     }
 
     @Test
-    @DisplayName("from() targetId null olduğunda IllegalArgumentException fırlatır")
-    void from_throwsIllegalArgumentException_whenTargetIdIsNull() {
+    @DisplayName("from() targetId null olduğunda FieldInvalidException fırlatır")
+    void from_throwsFieldInvalidException_whenTargetIdIsNull() {
         final AuditableDomainEvent event = eventWith("actor-1", null, ACTION, "JOB", null, null, null, Instant.now());
 
         assertThatThrownBy(() -> AuditLog.from(event))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(FieldInvalidException.class)
                 .hasMessageContaining("targetId");
     }
 
     @Test
-    @DisplayName("from() targetId boş (blank) olduğunda IllegalArgumentException fırlatır")
-    void from_throwsIllegalArgumentException_whenTargetIdIsBlank() {
+    @DisplayName("from() targetId boş (blank) olduğunda FieldInvalidException fırlatır")
+    void from_throwsFieldInvalidException_whenTargetIdIsBlank() {
         final AuditableDomainEvent event = eventWith("actor-1", null, ACTION, "JOB", "   ", null, null, Instant.now());
 
         assertThatThrownBy(() -> AuditLog.from(event))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(FieldInvalidException.class)
                 .hasMessageContaining("targetId");
     }
 
