@@ -58,7 +58,7 @@ public abstract class JmBaseEntity {
                 .map(Jwt::getSubject)
                 .orElse("JM");
 
-        this.updatedAt = Optional.ofNullable(this.updatedAt).orElse(LocalDateTime.now());
+        this.updatedAt = LocalDateTime.now();
     }
 
 }
