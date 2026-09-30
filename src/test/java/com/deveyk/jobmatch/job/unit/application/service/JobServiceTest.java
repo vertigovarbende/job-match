@@ -77,19 +77,19 @@ class JobServiceTest {
         when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
         when(this.jobRepository.save(any(Job.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final CreateJobCommand command = new CreateJobCommand(
-                "Backend Developer",
-                "description",
-                Seniority.MID_SENIOR,
-                EmploymentType.FULL_TIME,
-                WorkplaceType.REMOTE,
-                VALID_LOCATION,
-                VALID_SALARY_RANGE,
-                3,
-                LocalDateTime.now().plusDays(30),
-                Set.of(1L),
-                Set.of(2L)
-        );
+        final CreateJobCommand command = CreateJobCommand.builder()
+                .title("Backend Developer")
+                .description("description")
+                .seniority(Seniority.MID_SENIOR)
+                .employmentType(EmploymentType.FULL_TIME)
+                .workplaceType(WorkplaceType.REMOTE)
+                .location(VALID_LOCATION)
+                .salaryRange(VALID_SALARY_RANGE)
+                .minimumExperience(3)
+                .expiresAt(LocalDateTime.now().plusDays(30))
+                .requiredSkillIds(Set.of(1L))
+                .preferredSkillIds(Set.of(2L))
+                .build();
 
         final Job result = this.jobService.createJob(command);
 
@@ -106,19 +106,19 @@ class JobServiceTest {
 
         when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.empty());
 
-        final CreateJobCommand command = new CreateJobCommand(
-                "Backend Developer",
-                "description",
-                Seniority.MID_SENIOR,
-                EmploymentType.FULL_TIME,
-                WorkplaceType.REMOTE,
-                VALID_LOCATION,
-                VALID_SALARY_RANGE,
-                3,
-                LocalDateTime.now().plusDays(30),
-                Set.of(),
-                Set.of()
-        );
+        final CreateJobCommand command = CreateJobCommand.builder()
+                .title("Backend Developer")
+                .description("description")
+                .seniority(Seniority.MID_SENIOR)
+                .employmentType(EmploymentType.FULL_TIME)
+                .workplaceType(WorkplaceType.REMOTE)
+                .location(VALID_LOCATION)
+                .salaryRange(VALID_SALARY_RANGE)
+                .minimumExperience(3)
+                .expiresAt(LocalDateTime.now().plusDays(30))
+                .requiredSkillIds(Set.of())
+                .preferredSkillIds(Set.of())
+                .build();
 
         assertThatThrownBy(() -> this.jobService.createJob(command))
                 .isInstanceOf(CompanyMembershipRequiredException.class);
@@ -135,20 +135,20 @@ class JobServiceTest {
         when(this.jobRepository.findById(5L)).thenReturn(Optional.of(existing));
         when(this.jobRepository.save(any(Job.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final UpdateJobCommand command = new UpdateJobCommand(
-                5L,
-                "Senior Backend Developer",
-                "Updated description",
-                Seniority.DIRECTOR,
-                EmploymentType.CONTRACT,
-                WorkplaceType.HYBRID,
-                VALID_LOCATION,
-                VALID_SALARY_RANGE,
-                5,
-                LocalDateTime.now().plusDays(60),
-                Set.of(3L),
-                Set.of(4L)
-        );
+        final UpdateJobCommand command = UpdateJobCommand.builder()
+                .id(5L)
+                .title("Senior Backend Developer")
+                .description("Updated description")
+                .seniority(Seniority.DIRECTOR)
+                .employmentType(EmploymentType.CONTRACT)
+                .workplaceType(WorkplaceType.HYBRID)
+                .location(VALID_LOCATION)
+                .salaryRange(VALID_SALARY_RANGE)
+                .minimumExperience(5)
+                .expiresAt(LocalDateTime.now().plusDays(60))
+                .requiredSkillIds(Set.of(3L))
+                .preferredSkillIds(Set.of(4L))
+                .build();
 
         final Job result = this.jobService.updateJob(command);
 
@@ -164,10 +164,20 @@ class JobServiceTest {
 
         when(this.jobRepository.findById(99L)).thenReturn(Optional.empty());
 
-        final UpdateJobCommand command = new UpdateJobCommand(
-                99L, "Title", "description", Seniority.MID_SENIOR, EmploymentType.FULL_TIME, WorkplaceType.REMOTE,
-                VALID_LOCATION, VALID_SALARY_RANGE, 3, LocalDateTime.now().plusDays(30), Set.of(), Set.of()
-        );
+        final UpdateJobCommand command = UpdateJobCommand.builder()
+                .id(99L)
+                .title("Title")
+                .description("description")
+                .seniority(Seniority.MID_SENIOR)
+                .employmentType(EmploymentType.FULL_TIME)
+                .workplaceType(WorkplaceType.REMOTE)
+                .location(VALID_LOCATION)
+                .salaryRange(VALID_SALARY_RANGE)
+                .minimumExperience(3)
+                .expiresAt(LocalDateTime.now().plusDays(30))
+                .requiredSkillIds(Set.of())
+                .preferredSkillIds(Set.of())
+                .build();
 
         assertThatThrownBy(() -> this.jobService.updateJob(command))
                 .isInstanceOf(JobNotFoundException.class);
@@ -322,10 +332,17 @@ class JobServiceTest {
     @DisplayName("searchPublishedJobs() criteria ve pageable'i oldugu gibi repository'ye iletir")
     void searchPublishedJobs_delegatesToRepositoryWithGivenCriteriaAndPageable() {
 
-        final JobSearchCriteria criteria = new JobSearchCriteria(
-                "backend", Seniority.MID_SENIOR, EmploymentType.FULL_TIME, WorkplaceType.REMOTE,
-                "Turkiye", "Istanbul", BigDecimal.valueOf(50000), Set.of(1L)
-        );
+        final JobSearchCriteria criteria = JobSearchCriteria.builder()
+                .q("backend")
+                .seniority(Seniority.MID_SENIOR)
+                .employmentType(EmploymentType.FULL_TIME)
+                .workplaceType(WorkplaceType.REMOTE)
+                .locationCountry("Turkiye")
+                .locationCity("Istanbul")
+                .salaryMin(BigDecimal.valueOf(50000))
+                .skillIds(Set.of(1L))
+                .build();
+
         final Pageable pageable = Pageable.ofSize(20);
         final JmPage<JobSearchResult> expected = JmPage.<JobSearchResult>builder().build();
         when(this.jobRepository.findAllPublished(criteria, pageable)).thenReturn(expected);
@@ -343,7 +360,10 @@ class JobServiceTest {
 
         when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
 
-        final JobListCriteria criteria = new JobListCriteria(JobStatusType.PUBLISHED, null, null, null, null, null, null, null, Set.of());
+        final JobListCriteria criteria = JobListCriteria.builder()
+                .status(JobStatusType.PUBLISHED)
+                .skillIds(Set.of())
+                .build();
         final Pageable pageable = Pageable.ofSize(20);
         final JmPage<Job> expected = JmPage.<Job>builder().build();
         when(this.jobRepository.findAllForCompany(1L, criteria, pageable)).thenReturn(expected);
@@ -360,7 +380,9 @@ class JobServiceTest {
 
         when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.empty());
 
-        final JobListCriteria criteria = new JobListCriteria(null, null, null, null, null, null, null, null, Set.of());
+        final JobListCriteria criteria = JobListCriteria.builder()
+                .skillIds(Set.of())
+                .build();
 
         assertThatThrownBy(() -> this.jobService.listMyJobs(criteria, Pageable.ofSize(20)))
                 .isInstanceOf(CompanyMembershipRequiredException.class);
