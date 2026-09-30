@@ -5,10 +5,12 @@ import com.deveyk.jobmatch.shared.domain.Seniority;
 import com.deveyk.jobmatch.shared.domain.WorkplaceType;
 import com.deveyk.jobmatch.shared.domain.model.Location;
 import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
+@Builder
 public record UpdateJobCommand(
         Long id,
         String title,
