@@ -34,6 +34,14 @@ public final class SalaryRange {
         this.max = max;
     }
 
+    public static SalaryRange ofNullable(final Money min, final Money max) {
+        if (min == null || max == null) {
+            return null;
+        }
+
+        return new SalaryRange(min, max);
+    }
+
     public boolean overlaps(final SalaryRange other) {
 
         if (other == null || !this.min.sameCurrency(other.min)) {

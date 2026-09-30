@@ -17,9 +17,9 @@ import com.deveyk.jobmatch.job.infrastructure.persistence.mapper.JobPersistenceM
 import com.deveyk.jobmatch.job.infrastructure.persistence.repository.SpringDataJobJpaRepository;
 import com.deveyk.jobmatch.job.infrastructure.persistence.repository.SpringDataJobSkillJpaRepository;
 import com.deveyk.jobmatch.shared.domain.model.JmPage;
+import com.deveyk.jobmatch.shared.infrastructure.persistence.JmConstraintViolations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -147,7 +147,7 @@ public class JobRepositoryAdapter implements JobRepository {
 
         } catch (DataIntegrityViolationException violation) {
 
-            final String constraintName = extractConstraintName(violation);
+            final String constraintName = JmConstraintViolations.extractConstraintName(violation);
 
             if (UNIQUE_CONSTRAINT_NAME.equals(constraintName)) {
 
@@ -167,19 +167,6 @@ public class JobRepositoryAdapter implements JobRepository {
 
         }
 
-    }
-
-    private static String extractConstraintName(final DataIntegrityViolationException violation) {
-        Throwable cause = violation.getCause();
-
-        while (cause != null) {
-            if (cause instanceof ConstraintViolationException constraintViolation) {
-                return constraintViolation.getConstraintName();
-            }
-            cause = cause.getCause();
-        }
-
-        return null;
     }
 
 }

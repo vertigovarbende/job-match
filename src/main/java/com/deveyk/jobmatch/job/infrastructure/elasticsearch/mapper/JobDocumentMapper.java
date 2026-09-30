@@ -38,21 +38,13 @@ public interface JobDocumentMapper {
     }
 
     default Location toLocation(final JobDocument document) {
-        if (document.getLocationCountry() == null && document.getLocationCity() == null) {
-            return null;
-        }
-
-        return new Location(document.getLocationCountry(), document.getLocationCity());
+        return Location.ofNullable(document.getLocationCountry(), document.getLocationCity());
     }
 
     default SalaryRange toSalaryRange(final JobDocument document) {
-        if (document.getSalaryMinAmount() == null || document.getSalaryMaxAmount() == null) {
-            return null;
-        }
-
-        return new SalaryRange(
-                new Money(document.getSalaryMinAmount(), document.getSalaryCurrency()),
-                new Money(document.getSalaryMaxAmount(), document.getSalaryCurrency())
+        return SalaryRange.ofNullable(
+                Money.ofNullable(document.getSalaryMinAmount(), document.getSalaryCurrency()),
+                Money.ofNullable(document.getSalaryMaxAmount(), document.getSalaryCurrency())
         );
     }
 

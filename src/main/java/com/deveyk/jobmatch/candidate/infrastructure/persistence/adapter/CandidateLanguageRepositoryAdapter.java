@@ -7,9 +7,9 @@ import com.deveyk.jobmatch.candidate.domain.model.CandidateLanguage;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.entity.CandidateLanguageEntity;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.mapper.CandidateLanguagePersistenceMapper;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.repository.SpringDataCandidateLanguageJpaRepository;
+import com.deveyk.jobmatch.shared.infrastructure.persistence.JmConstraintViolations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +50,7 @@ public class CandidateLanguageRepositoryAdapter implements CandidateLanguageRepo
 
         } catch (DataIntegrityViolationException violation) {
 
-            final String constraintName = extractConstraintName(violation);
+            final String constraintName = JmConstraintViolations.extractConstraintName(violation);
 
             if (UNIQUE_CONSTRAINT_NAME.equals(constraintName)) {
 
@@ -74,19 +74,6 @@ public class CandidateLanguageRepositoryAdapter implements CandidateLanguageRepo
     @Override
     public void deleteByCandidateIdAndLanguageId(final Long candidateId, final Long languageId) {
         this.springDataCandidateLanguageJpaRepository.deleteByCandidateIdAndLanguageId(candidateId, languageId);
-    }
-
-    private static String extractConstraintName(final DataIntegrityViolationException violation) {
-        Throwable cause = violation.getCause();
-
-        while (cause != null) {
-            if (cause instanceof ConstraintViolationException constraintViolation) {
-                return constraintViolation.getConstraintName();
-            }
-            cause = cause.getCause();
-        }
-
-        return null;
     }
 
 }

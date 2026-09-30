@@ -42,21 +42,13 @@ public interface JobPersistenceMapper {
     }
 
     default Location toLocation(final JobEntity entity) {
-        if (entity.getLocationCountry() == null && entity.getLocationCity() == null) {
-            return null;
-        }
-
-        return new Location(entity.getLocationCountry(), entity.getLocationCity());
+        return Location.ofNullable(entity.getLocationCountry(), entity.getLocationCity());
     }
 
     default SalaryRange toSalaryRange(final JobEntity entity) {
-        if (entity.getSalaryMinAmount() == null || entity.getSalaryMaxAmount() == null) {
-            return null;
-        }
-
-        return new SalaryRange(
-                new Money(entity.getSalaryMinAmount(), entity.getSalaryCurrency()),
-                new Money(entity.getSalaryMaxAmount(), entity.getSalaryCurrency())
+        return SalaryRange.ofNullable(
+                Money.ofNullable(entity.getSalaryMinAmount(), entity.getSalaryCurrency()),
+                Money.ofNullable(entity.getSalaryMaxAmount(), entity.getSalaryCurrency())
         );
     }
 
