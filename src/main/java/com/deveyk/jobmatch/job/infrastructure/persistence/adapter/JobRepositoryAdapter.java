@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -65,9 +66,7 @@ public class JobRepositoryAdapter implements JobRepository {
 
     @Override
     public List<Job> findAllByStatusAndExpiresAtBefore(final JobStatusType status, final LocalDateTime cutoff) {
-        return this.springDataJobJpaRepository.findAllByStatusAndExpiresAtBefore(status, cutoff).stream()
-                .map(this::toDomainWithSkills)
-                .toList();
+        return this.toDomainListWithSkills(this.springDataJobJpaRepository.findAllByStatusAndExpiresAtBefore(status, cutoff));
     }
 
     @Override
@@ -93,17 +92,35 @@ public class JobRepositoryAdapter implements JobRepository {
 
         final Page<JobEntity> page = this.springDataJobJpaRepository.findAll(filter.toSpecification(), pageable);
 
-        final var content = page.getContent().stream()
-                .map(this::toDomainWithSkills)
-                .toList();
+        final List<Job> content = this.toDomainListWithSkills(page.getContent());
 
         return JmPage.of(filter, page, content);
 
     }
 
     private Job toDomainWithSkills(final JobEntity entity) {
-
         final List<JobSkillEntity> skillEntities = this.springDataJobSkillJpaRepository.findAllByJobId(entity.getId());
+        return this.toDomain(entity, skillEntities);
+    }
+
+    private List<Job> toDomainListWithSkills(final List<JobEntity> entities) {
+
+        if (entities.isEmpty()) {
+            return List.of();
+        }
+
+        final List<Long> jobIds = entities.stream().map(JobEntity::getId).toList();
+
+        final Map<Long, List<JobSkillEntity>> skillsByJobId = this.springDataJobSkillJpaRepository.findAllByJobIdIn(jobIds).stream()
+                .collect(Collectors.groupingBy(JobSkillEntity::getJobId));
+
+        return entities.stream()
+                .map(entity -> this.toDomain(entity, skillsByJobId.getOrDefault(entity.getId(), List.of())))
+                .toList();
+
+    }
+
+    private Job toDomain(final JobEntity entity, final List<JobSkillEntity> skillEntities) {
 
         final Set<Long> requiredSkillIds = skillEntities.stream()
                 .filter(skill -> skill.getSkillType() == JobSkillType.REQUIRED)
