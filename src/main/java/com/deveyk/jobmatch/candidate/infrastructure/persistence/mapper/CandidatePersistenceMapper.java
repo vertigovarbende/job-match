@@ -63,21 +63,13 @@ public interface CandidatePersistenceMapper {
     }
 
     default Location toLocation(final CandidateEntity entity) {
-        if (entity.getLocationCountry() == null && entity.getLocationCity() == null) {
-            return null;
-        }
-
-        return new Location(entity.getLocationCountry(), entity.getLocationCity());
+        return Location.ofNullable(entity.getLocationCountry(), entity.getLocationCity());
     }
 
     default SalaryRange toSalaryRange(final CandidateEntity entity) {
-        if (entity.getDesiredSalaryMinAmount() == null || entity.getDesiredSalaryMaxAmount() == null) {
-            return null;
-        }
-
-        return new SalaryRange(
-                new Money(entity.getDesiredSalaryMinAmount(), entity.getDesiredSalaryCurrency()),
-                new Money(entity.getDesiredSalaryMaxAmount(), entity.getDesiredSalaryCurrency())
+        return SalaryRange.ofNullable(
+                Money.ofNullable(entity.getDesiredSalaryMinAmount(), entity.getDesiredSalaryCurrency()),
+                Money.ofNullable(entity.getDesiredSalaryMaxAmount(), entity.getDesiredSalaryCurrency())
         );
     }
 

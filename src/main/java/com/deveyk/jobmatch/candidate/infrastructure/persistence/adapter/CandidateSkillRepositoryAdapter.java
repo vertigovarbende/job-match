@@ -7,9 +7,9 @@ import com.deveyk.jobmatch.candidate.domain.model.CandidateSkill;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.entity.CandidateSkillEntity;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.mapper.CandidateSkillPersistenceMapper;
 import com.deveyk.jobmatch.candidate.infrastructure.persistence.repository.SpringDataCandidateSkillJpaRepository;
+import com.deveyk.jobmatch.shared.infrastructure.persistence.JmConstraintViolations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +50,7 @@ public class CandidateSkillRepositoryAdapter implements CandidateSkillRepository
 
         } catch (DataIntegrityViolationException violation) {
 
-            final String constraintName = extractConstraintName(violation);
+            final String constraintName = JmConstraintViolations.extractConstraintName(violation);
 
             if (UNIQUE_CONSTRAINT_NAME.equals(constraintName)) {
 
@@ -74,19 +74,6 @@ public class CandidateSkillRepositoryAdapter implements CandidateSkillRepository
     @Override
     public void deleteByCandidateIdAndSkillId(final Long candidateId, final Long skillId) {
         this.springDataCandidateSkillJpaRepository.deleteByCandidateIdAndSkillId(candidateId, skillId);
-    }
-
-    private static String extractConstraintName(final DataIntegrityViolationException violation) {
-        Throwable cause = violation.getCause();
-
-        while (cause != null) {
-            if (cause instanceof ConstraintViolationException constraintViolation) {
-                return constraintViolation.getConstraintName();
-            }
-            cause = cause.getCause();
-        }
-
-        return null;
     }
 
 }

@@ -17,11 +17,7 @@ public interface CompanyPersistenceMapper {
     Company toDomain(CompanyEntity entity);
 
     default Location toHeadquarters(final CompanyEntity entity) {
-        if (entity.getHeadquartersCountry() == null && entity.getHeadquartersCity() == null) {
-            return null;
-        }
-
-        return new Location(entity.getHeadquartersCountry(), entity.getHeadquartersCity());
+        return Location.ofNullable(entity.getHeadquartersCountry(), entity.getHeadquartersCity());
     }
 
 }

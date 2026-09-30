@@ -17,11 +17,7 @@ public interface ExperiencePersistenceMapper {
     Experience toDomain(ExperienceEntity entity);
 
     default Location toLocation(final ExperienceEntity entity) {
-        if (entity.getLocationCountry() == null && entity.getLocationCity() == null) {
-            return null;
-        }
-
-        return new Location(entity.getLocationCountry(), entity.getLocationCity());
+        return Location.ofNullable(entity.getLocationCountry(), entity.getLocationCity());
     }
 
 }

@@ -6,25 +6,16 @@ import com.deveyk.jobmatch.company.application.port.in.command.VerifyCompanyComm
 import com.deveyk.jobmatch.company.presentation.rest.request.CreateCompanyRequest;
 import com.deveyk.jobmatch.company.presentation.rest.request.UpdateCompanyProfileRequest;
 import com.deveyk.jobmatch.identity.domain.Role;
-import com.deveyk.jobmatch.shared.domain.model.Location;
-import com.deveyk.jobmatch.shared.presentation.rest.request.LocationRequest;
+import com.deveyk.jobmatch.shared.presentation.rest.mapper.CommonRequestMapper;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface CompanyProfileRequestMapper {
+public interface CompanyProfileRequestMapper extends CommonRequestMapper {
 
     CreateCompanyCommand toCommand(CreateCompanyRequest request, Role role);
 
     UpdateCompanyProfileCommand toCommand(UpdateCompanyProfileRequest request, Long id);
 
     VerifyCompanyCommand toCommand(Long id, String actorId);
-
-    default Location toLocation(final LocationRequest request) {
-        if (request == null) {
-            return null;
-        }
-
-        return new Location(request.country(), request.city());
-    }
 
 }

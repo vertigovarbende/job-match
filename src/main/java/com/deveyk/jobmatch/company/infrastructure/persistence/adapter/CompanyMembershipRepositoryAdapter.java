@@ -7,9 +7,9 @@ import com.deveyk.jobmatch.company.domain.model.CompanyMembership;
 import com.deveyk.jobmatch.company.infrastructure.persistence.entity.CompanyMembershipEntity;
 import com.deveyk.jobmatch.company.infrastructure.persistence.mapper.CompanyMembershipPersistenceMapper;
 import com.deveyk.jobmatch.company.infrastructure.persistence.repository.SpringDataCompanyMembershipJpaRepository;
+import com.deveyk.jobmatch.shared.infrastructure.persistence.JmConstraintViolations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +59,7 @@ public class CompanyMembershipRepositoryAdapter implements CompanyMembershipRepo
 
         } catch (DataIntegrityViolationException violation) {
 
-            final String constraintName = extractConstraintName(violation);
+            final String constraintName = JmConstraintViolations.extractConstraintName(violation);
 
             if (UNIQUE_CONSTRAINT_NAME.equals(constraintName)) {
 
@@ -90,19 +90,6 @@ public class CompanyMembershipRepositoryAdapter implements CompanyMembershipRepo
     @Override
     public void deleteByCompanyIdAndUserId(final Long companyId, final Long userId) {
         this.springDataCompanyMembershipJpaRepository.deleteByCompanyIdAndUserId(companyId, userId);
-    }
-
-    private static String extractConstraintName(final DataIntegrityViolationException violation) {
-        Throwable cause = violation.getCause();
-
-        while (cause != null) {
-            if (cause instanceof ConstraintViolationException constraintViolation) {
-                return constraintViolation.getConstraintName();
-            }
-            cause = cause.getCause();
-        }
-
-        return null;
     }
 
 }

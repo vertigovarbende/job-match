@@ -31,6 +31,14 @@ public final class Money {
         this.currency = currency;
     }
 
+    public static Money ofNullable(final BigDecimal amount, final String currency) {
+        if (amount == null) {
+            return null;
+        }
+
+        return new Money(amount, currency);
+    }
+
     public boolean sameCurrency(final Money other) {
         return other != null && this.currency.equalsIgnoreCase(other.currency);
     }

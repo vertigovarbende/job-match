@@ -25,6 +25,14 @@ public final class Location {
         this.city = city;
     }
 
+    public static Location ofNullable(final String country, final String city) {
+        if (country == null && city == null) {
+            return null;
+        }
+
+        return new Location(country, city);
+    }
+
     public boolean sameCity(final Location other) {
         if (other == null) {
             return false;
