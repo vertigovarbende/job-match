@@ -49,8 +49,16 @@ class ExperienceServiceTest {
 
         when(this.experienceRepository.save(any(Experience.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final AddExperienceCommand command = new AddExperienceCommand(1L, "Backend Developer", "Acme A.S.",
-                LOCATION, EmploymentType.FULL_TIME, START_DATE, END_DATE, "aciklama");
+        final AddExperienceCommand command = AddExperienceCommand.builder()
+                .candidateId(1L)
+                .title("Backend Developer")
+                .company("Acme A.S.")
+                .location(LOCATION)
+                .employmentType(EmploymentType.FULL_TIME)
+                .startDate(START_DATE)
+                .endDate(END_DATE)
+                .description("aciklama")
+                .build();
 
         final Experience result = this.experienceService.addExperience(command);
 
@@ -69,8 +77,17 @@ class ExperienceServiceTest {
         when(this.experienceRepository.findById(5L)).thenReturn(Optional.of(existing));
         when(this.experienceRepository.save(existing)).thenReturn(existing);
 
-        final UpdateExperienceCommand command = new UpdateExperienceCommand(1L, 5L, "Senior Backend Developer",
-                "Globex GmbH", LOCATION, EmploymentType.CONTRACT, START_DATE, null, "halen devam ediyor");
+        final UpdateExperienceCommand command = UpdateExperienceCommand.builder()
+                .candidateId(1L)
+                .experienceId(5L)
+                .title("Senior Backend Developer")
+                .company("Globex GmbH")
+                .location(LOCATION)
+                .employmentType(EmploymentType.CONTRACT)
+                .startDate(START_DATE)
+                .endDate(null)
+                .description("halen devam ediyor")
+                .build();
 
         final Experience result = this.experienceService.updateExperience(command);
 
@@ -87,8 +104,16 @@ class ExperienceServiceTest {
 
         when(this.experienceRepository.findById(404L)).thenReturn(Optional.empty());
 
-        final UpdateExperienceCommand command = new UpdateExperienceCommand(1L, 404L, "Title", "Company",
-                LOCATION, EmploymentType.FULL_TIME, START_DATE, END_DATE, null);
+        final UpdateExperienceCommand command = UpdateExperienceCommand.builder()
+                .candidateId(1L)
+                .experienceId(404L)
+                .title("Title")
+                .company("Company")
+                .location(LOCATION)
+                .employmentType(EmploymentType.FULL_TIME)
+                .startDate(START_DATE)
+                .endDate(END_DATE)
+                .build();
 
         assertThatThrownBy(() -> this.experienceService.updateExperience(command))
                 .isInstanceOf(CandidateResourceNotFoundException.class);
@@ -104,8 +129,16 @@ class ExperienceServiceTest {
         final Experience existing = existingExperience(5L, 1L);
         when(this.experienceRepository.findById(5L)).thenReturn(Optional.of(existing));
 
-        final UpdateExperienceCommand command = new UpdateExperienceCommand(2L, 5L, "Title", "Company",
-                LOCATION, EmploymentType.FULL_TIME, START_DATE, END_DATE, null);
+        final UpdateExperienceCommand command = UpdateExperienceCommand.builder()
+                .candidateId(2L)
+                .experienceId(5L)
+                .title("Title")
+                .company("Company")
+                .location(LOCATION)
+                .employmentType(EmploymentType.FULL_TIME)
+                .startDate(START_DATE)
+                .endDate(END_DATE)
+                .build();
 
         assertThatThrownBy(() -> this.experienceService.updateExperience(command))
                 .isInstanceOf(CandidateResourceForbiddenException.class);

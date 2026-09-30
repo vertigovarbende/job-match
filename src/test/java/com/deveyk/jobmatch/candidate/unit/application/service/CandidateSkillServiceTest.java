@@ -41,7 +41,11 @@ class CandidateSkillServiceTest {
 
         when(this.candidateSkillRepository.save(any(CandidateSkill.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final AttachCandidateSkillCommand command = new AttachCandidateSkillCommand(1L, 100L, ProficiencyLevel.ADVANCED);
+        final AttachCandidateSkillCommand command = AttachCandidateSkillCommand.builder()
+                .candidateId(1L)
+                .skillId(100L)
+                .proficiencyLevel(ProficiencyLevel.ADVANCED)
+                .build();
 
         final CandidateSkill result = this.candidateSkillService.attachSkill(command);
 
@@ -60,7 +64,11 @@ class CandidateSkillServiceTest {
         when(this.candidateSkillRepository.findByCandidateIdAndSkillId(1L, 100L)).thenReturn(Optional.of(existing));
         when(this.candidateSkillRepository.save(existing)).thenReturn(existing);
 
-        final UpdateCandidateSkillCommand command = new UpdateCandidateSkillCommand(1L, 100L, ProficiencyLevel.EXPERT);
+        final UpdateCandidateSkillCommand command = UpdateCandidateSkillCommand.builder()
+                .candidateId(1L)
+                .skillId(100L)
+                .proficiencyLevel(ProficiencyLevel.EXPERT)
+                .build();
 
         final CandidateSkill result = this.candidateSkillService.updateSkillProficiency(command);
 
@@ -75,7 +83,11 @@ class CandidateSkillServiceTest {
 
         when(this.candidateSkillRepository.findByCandidateIdAndSkillId(1L, 100L)).thenReturn(Optional.empty());
 
-        final UpdateCandidateSkillCommand command = new UpdateCandidateSkillCommand(1L, 100L, ProficiencyLevel.EXPERT);
+        final UpdateCandidateSkillCommand command = UpdateCandidateSkillCommand.builder()
+                .candidateId(1L)
+                .skillId(100L)
+                .proficiencyLevel(ProficiencyLevel.EXPERT)
+                .build();
 
         assertThatThrownBy(() -> this.candidateSkillService.updateSkillProficiency(command))
                 .isInstanceOf(CandidateResourceNotFoundException.class);

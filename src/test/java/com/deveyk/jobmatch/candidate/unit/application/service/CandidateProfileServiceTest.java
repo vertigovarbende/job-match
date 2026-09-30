@@ -50,7 +50,10 @@ class CandidateProfileServiceTest {
         when(this.candidateRepository.findByUserId(1L)).thenReturn(Optional.empty());
         when(this.candidateRepository.save(any(Candidate.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final CreateCandidateProfileCommand command = new CreateCandidateProfileCommand(1L, Role.CANDIDATE);
+        final CreateCandidateProfileCommand command = CreateCandidateProfileCommand.builder()
+                .userId(1L)
+                .role(Role.CANDIDATE)
+                .build();
 
         final Candidate result = this.candidateProfileService.createProfile(command);
 
@@ -64,7 +67,10 @@ class CandidateProfileServiceTest {
     @DisplayName("createProfile() rol CANDIDATE degilse CandidateRoleRequiredException firlatir ve kaydetmez")
     void createProfile_throwsCandidateRoleRequiredException_whenRoleIsNotCandidate() {
 
-        final CreateCandidateProfileCommand command = new CreateCandidateProfileCommand(1L, Role.EMPLOYER);
+        final CreateCandidateProfileCommand command = CreateCandidateProfileCommand.builder()
+                .userId(1L)
+                .role(Role.EMPLOYER)
+                .build();
 
         assertThatThrownBy(() -> this.candidateProfileService.createProfile(command))
                 .isInstanceOf(CandidateRoleRequiredException.class);
@@ -79,7 +85,10 @@ class CandidateProfileServiceTest {
 
         when(this.candidateRepository.findByUserId(1L)).thenReturn(Optional.of(existingCandidate(10L, 1L)));
 
-        final CreateCandidateProfileCommand command = new CreateCandidateProfileCommand(1L, Role.CANDIDATE);
+        final CreateCandidateProfileCommand command = CreateCandidateProfileCommand.builder()
+                .userId(1L)
+                .role(Role.CANDIDATE)
+                .build();
 
         assertThatThrownBy(() -> this.candidateProfileService.createProfile(command))
                 .isInstanceOf(CandidateAlreadyExistsException.class);
@@ -98,8 +107,20 @@ class CandidateProfileServiceTest {
 
         final Location location = new Location("Turkiye", "Istanbul");
         final WorkplacePreferences preferences = new WorkplacePreferences(Set.of(WorkplaceType.REMOTE));
-        final SalaryRange desiredSalary = new SalaryRange(new Money(BigDecimal.valueOf(40000), "USD"), new Money(BigDecimal.valueOf(60000), "USD"));
-        final UpdateCandidateProfileCommand command = new UpdateCandidateProfileCommand(1L, "Backend Developer", "ozet", location, preferences, desiredSalary);
+
+        final SalaryRange desiredSalary = new SalaryRange(
+                new Money(BigDecimal.valueOf(40000), "USD"),
+                new Money(BigDecimal.valueOf(60000), "USD")
+        );
+
+        final UpdateCandidateProfileCommand command = UpdateCandidateProfileCommand.builder()
+                .userId(1L)
+                .headline("Backend Developer")
+                .summary("ozet")
+                .location(location)
+                .workplacePreferences(preferences)
+                .desiredSalary(desiredSalary)
+                .build();
 
         final Candidate result = this.candidateProfileService.updateProfile(command);
 
@@ -116,7 +137,9 @@ class CandidateProfileServiceTest {
 
         when(this.candidateRepository.findByUserId(1L)).thenReturn(Optional.empty());
 
-        final UpdateCandidateProfileCommand command = new UpdateCandidateProfileCommand(1L, null, null, null, null, null);
+        final UpdateCandidateProfileCommand command = UpdateCandidateProfileCommand.builder()
+                .userId(1L)
+                .build();
 
         assertThatThrownBy(() -> this.candidateProfileService.updateProfile(command))
                 .isInstanceOf(CandidateNotFoundException.class);

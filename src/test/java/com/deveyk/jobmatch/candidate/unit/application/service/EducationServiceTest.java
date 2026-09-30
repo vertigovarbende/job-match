@@ -46,8 +46,15 @@ class EducationServiceTest {
 
         when(this.educationRepository.save(any(Education.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final AddEducationCommand command = new AddEducationCommand(1L, "Istanbul Teknik Universitesi",
-                "Lisans", "Bilgisayar Muhendisligi", START_DATE, END_DATE, "aciklama");
+        final AddEducationCommand command = AddEducationCommand.builder()
+                .candidateId(1L)
+                .institution("Istanbul Teknik Universitesi")
+                .degree("Lisans")
+                .fieldOfStudy("Bilgisayar Muhendisligi")
+                .startDate(START_DATE)
+                .endDate(END_DATE)
+                .description("aciklama")
+                .build();
 
         final Education result = this.educationService.addEducation(command);
 
@@ -66,8 +73,16 @@ class EducationServiceTest {
         when(this.educationRepository.findById(5L)).thenReturn(Optional.of(existing));
         when(this.educationRepository.save(existing)).thenReturn(existing);
 
-        final UpdateEducationCommand command = new UpdateEducationCommand(1L, 5L, "Bogazici Universitesi",
-                "Yuksek Lisans", "Yazilim Muhendisligi", START_DATE, null, "devam ediyor");
+        final UpdateEducationCommand command = UpdateEducationCommand.builder()
+                .candidateId(1L)
+                .educationId(5L)
+                .institution("Bogazici Universitesi")
+                .degree("Yuksek Lisans")
+                .fieldOfStudy("Yazilim Muhendisligi")
+                .startDate(START_DATE)
+                .endDate(null)
+                .description("devam ediyor")
+                .build();
 
         final Education result = this.educationService.updateEducation(command);
 
@@ -84,8 +99,15 @@ class EducationServiceTest {
 
         when(this.educationRepository.findById(404L)).thenReturn(Optional.empty());
 
-        final UpdateEducationCommand command = new UpdateEducationCommand(1L, 404L, "Institution",
-                "Degree", "Field", START_DATE, END_DATE, null);
+        final UpdateEducationCommand command = UpdateEducationCommand.builder()
+                .candidateId(1L)
+                .educationId(404L)
+                .institution("Institution")
+                .degree("Degree")
+                .fieldOfStudy("Field")
+                .startDate(START_DATE)
+                .endDate(END_DATE)
+                .build();
 
         assertThatThrownBy(() -> this.educationService.updateEducation(command))
                 .isInstanceOf(CandidateResourceNotFoundException.class);
@@ -101,8 +123,15 @@ class EducationServiceTest {
         final Education existing = existingEducation(5L, 1L);
         when(this.educationRepository.findById(5L)).thenReturn(Optional.of(existing));
 
-        final UpdateEducationCommand command = new UpdateEducationCommand(2L, 5L, "Institution",
-                "Degree", "Field", START_DATE, END_DATE, null);
+        final UpdateEducationCommand command = UpdateEducationCommand.builder()
+                .candidateId(2L)
+                .educationId(5L)
+                .institution("Institution")
+                .degree("Degree")
+                .fieldOfStudy("Field")
+                .startDate(START_DATE)
+                .endDate(END_DATE)
+                .build();
 
         assertThatThrownBy(() -> this.educationService.updateEducation(command))
                 .isInstanceOf(CandidateResourceForbiddenException.class);

@@ -1,8 +1,11 @@
 
 package com.deveyk.jobmatch.candidate.application.port.in.command;
 
+import lombok.Builder;
+
 import java.time.LocalDate;
 
+@Builder
 public record UpdateCertificationCommand(
         Long candidateId,
         Long certificationId,

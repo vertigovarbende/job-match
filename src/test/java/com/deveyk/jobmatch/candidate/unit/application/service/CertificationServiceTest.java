@@ -46,8 +46,16 @@ class CertificationServiceTest {
 
         when(this.certificationRepository.save(any(Certification.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final AddCertificationCommand command = new AddCertificationCommand(1L, "AWS Certified Solutions Architect",
-                "Amazon Web Services", ISSUE_DATE, EXPIRY_DATE, "CRED-123", "https://aws.amazon.com/verify/CRED-123", "aciklama");
+        final AddCertificationCommand command = AddCertificationCommand.builder()
+                .candidateId(1L)
+                .name("AWS Certified Solutions Architect")
+                .issuingOrganization("Amazon Web Services")
+                .issueDate(ISSUE_DATE)
+                .expiryDate(EXPIRY_DATE)
+                .credentialId("CRED-123")
+                .credentialUrl("https://aws.amazon.com/verify/CRED-123")
+                .description("aciklama")
+                .build();
 
         final Certification result = this.certificationService.addCertification(command);
 
@@ -66,8 +74,17 @@ class CertificationServiceTest {
         when(this.certificationRepository.findById(5L)).thenReturn(Optional.of(existing));
         when(this.certificationRepository.save(existing)).thenReturn(existing);
 
-        final UpdateCertificationCommand command = new UpdateCertificationCommand(1L, 5L, "AWS Certified Developer",
-                "AWS", ISSUE_DATE, EXPIRY_DATE, "CRED-456", "https://aws.amazon.com/verify/CRED-456", "guncellendi");
+        final UpdateCertificationCommand command = UpdateCertificationCommand.builder()
+                .candidateId(1L)
+                .certificationId(5L)
+                .name("AWS Certified Developer")
+                .issuingOrganization("AWS")
+                .issueDate(ISSUE_DATE)
+                .expiryDate(EXPIRY_DATE)
+                .credentialId("CRED-456")
+                .credentialUrl("https://aws.amazon.com/verify/CRED-456")
+                .description("guncellendi")
+                .build();
 
         final Certification result = this.certificationService.updateCertification(command);
 
@@ -83,8 +100,14 @@ class CertificationServiceTest {
 
         when(this.certificationRepository.findById(404L)).thenReturn(Optional.empty());
 
-        final UpdateCertificationCommand command = new UpdateCertificationCommand(1L, 404L, "Name",
-                "Org", ISSUE_DATE, EXPIRY_DATE, null, null, null);
+        final UpdateCertificationCommand command = UpdateCertificationCommand.builder()
+                .candidateId(1L)
+                .certificationId(404L)
+                .name("Name")
+                .issuingOrganization("Org")
+                .issueDate(ISSUE_DATE)
+                .expiryDate(EXPIRY_DATE)
+                .build();
 
         assertThatThrownBy(() -> this.certificationService.updateCertification(command))
                 .isInstanceOf(CandidateResourceNotFoundException.class);
@@ -100,8 +123,14 @@ class CertificationServiceTest {
         final Certification existing = existingCertification(5L, 1L);
         when(this.certificationRepository.findById(5L)).thenReturn(Optional.of(existing));
 
-        final UpdateCertificationCommand command = new UpdateCertificationCommand(2L, 5L, "Name",
-                "Org", ISSUE_DATE, EXPIRY_DATE, null, null, null);
+        final UpdateCertificationCommand command = UpdateCertificationCommand.builder()
+                .candidateId(2L)
+                .certificationId(5L)
+                .name("Name")
+                .issuingOrganization("Org")
+                .issueDate(ISSUE_DATE)
+                .expiryDate(EXPIRY_DATE)
+                .build();
 
         assertThatThrownBy(() -> this.certificationService.updateCertification(command))
                 .isInstanceOf(CandidateResourceForbiddenException.class);

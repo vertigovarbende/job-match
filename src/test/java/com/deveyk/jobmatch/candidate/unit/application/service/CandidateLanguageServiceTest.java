@@ -41,7 +41,11 @@ class CandidateLanguageServiceTest {
 
         when(this.candidateLanguageRepository.save(any(CandidateLanguage.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final AttachCandidateLanguageCommand command = new AttachCandidateLanguageCommand(1L, 200L, ProficiencyLevel.ADVANCED);
+        final AttachCandidateLanguageCommand command = AttachCandidateLanguageCommand.builder()
+                .candidateId(1L)
+                .languageId(200L)
+                .proficiencyLevel(ProficiencyLevel.ADVANCED)
+                .build();
 
         final CandidateLanguage result = this.candidateLanguageService.attachLanguage(command);
 
@@ -60,7 +64,11 @@ class CandidateLanguageServiceTest {
         when(this.candidateLanguageRepository.findByCandidateIdAndLanguageId(1L, 200L)).thenReturn(Optional.of(existing));
         when(this.candidateLanguageRepository.save(existing)).thenReturn(existing);
 
-        final UpdateCandidateLanguageCommand command = new UpdateCandidateLanguageCommand(1L, 200L, ProficiencyLevel.NATIVE);
+        final UpdateCandidateLanguageCommand command = UpdateCandidateLanguageCommand.builder()
+                .candidateId(1L)
+                .languageId(200L)
+                .proficiencyLevel(ProficiencyLevel.NATIVE)
+                .build();
 
         final CandidateLanguage result = this.candidateLanguageService.updateLanguageProficiency(command);
 
@@ -75,7 +83,11 @@ class CandidateLanguageServiceTest {
 
         when(this.candidateLanguageRepository.findByCandidateIdAndLanguageId(1L, 200L)).thenReturn(Optional.empty());
 
-        final UpdateCandidateLanguageCommand command = new UpdateCandidateLanguageCommand(1L, 200L, ProficiencyLevel.NATIVE);
+        final UpdateCandidateLanguageCommand command = UpdateCandidateLanguageCommand.builder()
+                .candidateId(1L)
+                .languageId(200L)
+                .proficiencyLevel(ProficiencyLevel.NATIVE)
+                .build();
 
         assertThatThrownBy(() -> this.candidateLanguageService.updateLanguageProficiency(command))
                 .isInstanceOf(CandidateResourceNotFoundException.class);

@@ -3,7 +3,9 @@ package com.deveyk.jobmatch.candidate.application.port.in.command;
 import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
 import com.deveyk.jobmatch.candidate.domain.model.WorkplacePreferences;
 import com.deveyk.jobmatch.shared.domain.model.Location;
+import lombok.Builder;
 
+@Builder
 public record UpdateCandidateProfileCommand(
         Long userId,
         String headline,
