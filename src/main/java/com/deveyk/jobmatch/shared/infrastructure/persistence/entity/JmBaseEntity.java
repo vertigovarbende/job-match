@@ -1,6 +1,7 @@
 package com.deveyk.jobmatch.shared.infrastructure.persistence.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -9,9 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -22,11 +23,14 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public abstract class JmBaseEntity {
 
+    @CreatedBy
     @Column(name = "created_by")
     protected String createdBy;
 
+    @LastModifiedBy
     @Column(name = "updated_by")
     protected String updatedBy;
 
@@ -38,26 +42,11 @@ public abstract class JmBaseEntity {
 
     @PrePersist
     public void prePersist() {
-
-        this.createdBy = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-                .map(Authentication::getPrincipal)
-                .filter(user -> !"anonymous".equals(user))
-                .map(Jwt.class::cast)
-                .map(Jwt::getSubject)
-                .orElse("JM");
-
         this.updatedAt = Optional.ofNullable(this.createdAt).orElse(LocalDateTime.now());
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedBy = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-                .map(Authentication::getPrincipal)
-                .filter(user -> !"anonymous".equals(user))
-                .map(Jwt.class::cast)
-                .map(Jwt::getSubject)
-                .orElse("JM");
-
         this.updatedAt = LocalDateTime.now();
     }
 
