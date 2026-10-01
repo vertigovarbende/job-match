@@ -1,16 +1,19 @@
 package com.deveyk.jobmatch.testsupport;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
+import org.springframework.boot.jpa.test.autoconfigure.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@AutoConfigureTestEntityManager
 public abstract class TestContainerConfiguration extends LogTrackerConfiguration {
 
     // ------ POSTGRES ------
@@ -19,6 +22,8 @@ public abstract class TestContainerConfiguration extends LogTrackerConfiguration
     private static final String KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.7.3";
     private static final String KEYCLOAK_REALM = "jobmatch";
     private static final String KEYCLOAK_REALM_IMPORT_CLASSPATH_FILE = "/keycloak/realm-export.json";
+    // ------ ELASTICSEARCH ------
+    private static final String ELASTICSEARCH_IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:9.4.6";
 
     @ServiceConnection
     protected static final PostgreSQLContainer POSTGRESQL_CONTAINER = new PostgreSQLContainer(DockerImageName.parse(POSTGRESQL_IMAGE))
@@ -31,9 +36,16 @@ public abstract class TestContainerConfiguration extends LogTrackerConfiguration
             .withRealmImportFile(KEYCLOAK_REALM_IMPORT_CLASSPATH_FILE)
             .withReuse(true);
 
+    @ServiceConnection
+    protected static final ElasticsearchContainer ELASTICSEARCH_CONTAINER = new ElasticsearchContainer(DockerImageName.parse(ELASTICSEARCH_IMAGE))
+            .withEnv("discovery.type", "single-node")
+            .withEnv("xpack.security.enabled", "false")
+            .withReuse(true);
+
     static {
         POSTGRESQL_CONTAINER.start();
         KEYCLOAK_CONTAINER.start();
+        ELASTICSEARCH_CONTAINER.start();
     }
 
     @DynamicPropertySource

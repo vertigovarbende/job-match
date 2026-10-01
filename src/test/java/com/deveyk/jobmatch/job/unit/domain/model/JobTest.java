@@ -6,6 +6,7 @@ import com.deveyk.jobmatch.job.domain.exception.JobFieldInvalidException;
 import com.deveyk.jobmatch.job.domain.exception.JobNotReadyForPublishException;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.domain.model.JobStatusType;
+import com.deveyk.jobmatch.job.testsupport.JobTestDataBuilder;
 import com.deveyk.jobmatch.shared.domain.EmploymentType;
 import com.deveyk.jobmatch.shared.domain.Seniority;
 import com.deveyk.jobmatch.shared.domain.WorkplaceType;
@@ -36,20 +37,20 @@ class JobTest {
 
         final LocalDateTime expiresAt = LocalDateTime.now().plusDays(30);
 
-        final Job job = Job.create(
-                1L,
-                "Backend Developer",
-                "Job description",
-                Seniority.MID_SENIOR,
-                EmploymentType.FULL_TIME,
-                WorkplaceType.REMOTE,
-                VALID_LOCATION,
-                VALID_SALARY_RANGE,
-                3,
-                expiresAt,
-                Set.of(1L, 2L),
-                Set.of(3L, 4L)
-        );
+        final Job job = JobTestDataBuilder.aJob()
+                .withCompanyId(1L)
+                .withTitle("Backend Developer")
+                .withDescription("Job description")
+                .withSeniority(Seniority.MID_SENIOR)
+                .withEmploymentType(EmploymentType.FULL_TIME)
+                .withWorkplaceType(WorkplaceType.REMOTE)
+                .withLocation(VALID_LOCATION)
+                .withSalaryRange(VALID_SALARY_RANGE)
+                .withMinimumExperience(3)
+                .withExpiresAt(expiresAt)
+                .withRequiredSkillIds(Set.of(1L, 2L))
+                .withPreferredSkillIds(Set.of(3L, 4L))
+                .build();
 
         assertThat(job.getId()).isNull();
         assertThat(job.getCompanyId()).isEqualTo(1L);
@@ -94,20 +95,9 @@ class JobTest {
     @DisplayName("create() companyId null oldugunda NullPointerException firlatir")
     void create_throwsNullPointerException_whenCompanyIdIsNull() {
 
-        assertThatThrownBy(() -> Job.create(
-                null,
-                "Backend Developer",
-                "Job description",
-                Seniority.MID_SENIOR,
-                EmploymentType.FULL_TIME,
-                WorkplaceType.REMOTE,
-                VALID_LOCATION,
-                VALID_SALARY_RANGE,
-                3,
-                LocalDateTime.now().plusDays(30),
-                Set.of(1L),
-                Set.of(2L)
-        ))
+        assertThatThrownBy(() -> JobTestDataBuilder.aJob()
+                .withCompanyId(null)
+                .build())
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("companyId");
 
@@ -117,20 +107,10 @@ class JobTest {
     @DisplayName("create() null skill id setlerini bos sete normalize eder")
     void create_normalizesNullSkillIdsToEmptySets() {
 
-        final Job job = Job.create(
-                1L,
-                "Backend Developer",
-                "Job description",
-                Seniority.MID_SENIOR,
-                EmploymentType.FULL_TIME,
-                WorkplaceType.REMOTE,
-                VALID_LOCATION,
-                VALID_SALARY_RANGE,
-                3,
-                LocalDateTime.now().plusDays(30),
-                null,
-                null
-        );
+        final Job job = JobTestDataBuilder.aJob()
+                .withRequiredSkillIds(null)
+                .withPreferredSkillIds(null)
+                .build();
 
         assertThat(job.getRequiredSkillIds()).isEmpty();
         assertThat(job.getPreferredSkillIds()).isEmpty();
@@ -141,20 +121,10 @@ class JobTest {
     @DisplayName("create() required ve preferred skill id'leri kesistiginde DuplicateSkillReferenceException firlatir")
     void create_throwsDuplicateSkillReferenceException_whenSkillIdsOverlap() {
 
-        assertThatThrownBy(() -> Job.create(
-                1L,
-                "Backend Developer",
-                "Job description",
-                Seniority.MID_SENIOR,
-                EmploymentType.FULL_TIME,
-                WorkplaceType.REMOTE,
-                VALID_LOCATION,
-                VALID_SALARY_RANGE,
-                3,
-                LocalDateTime.now().plusDays(30),
-                Set.of(1L, 2L),
-                Set.of(2L, 3L)
-        ))
+        assertThatThrownBy(() -> JobTestDataBuilder.aJob()
+                .withRequiredSkillIds(Set.of(1L, 2L))
+                .withPreferredSkillIds(Set.of(2L, 3L))
+                .build())
                 .isInstanceOf(DuplicateSkillReferenceException.class)
                 .hasMessageContaining("2");
 
@@ -358,20 +328,16 @@ class JobTest {
                                   final SalaryRange salaryRange,
                                   final EmploymentType employmentType,
                                   final WorkplaceType workplaceType) {
-        return Job.create(
-                1L,
-                title,
-                "Job description",
-                Seniority.MID_SENIOR,
-                employmentType,
-                workplaceType,
-                location,
-                salaryRange,
-                3,
-                LocalDateTime.now().plusDays(30),
-                Set.of(1L, 2L),
-                Set.of(3L, 4L)
-        );
+        return JobTestDataBuilder.aJob()
+                .withTitle(title)
+                .withDescription("Job description")
+                .withEmploymentType(employmentType)
+                .withWorkplaceType(workplaceType)
+                .withLocation(location)
+                .withSalaryRange(salaryRange)
+                .withRequiredSkillIds(Set.of(1L, 2L))
+                .withPreferredSkillIds(Set.of(3L, 4L))
+                .build();
     }
 
 }

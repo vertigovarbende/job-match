@@ -122,36 +122,47 @@ public class JobRepositoryAdapter implements JobRepository {
 
     private Job toDomain(final JobEntity entity, final List<JobSkillEntity> skillEntities) {
 
-        final Set<Long> requiredSkillIds = skillEntities.stream()
-                .filter(skill -> skill.getSkillType() == JobSkillType.REQUIRED)
-                .map(JobSkillEntity::getSkillId)
-                .collect(Collectors.toSet());
-
-        final Set<Long> preferredSkillIds = skillEntities.stream()
-                .filter(skill -> skill.getSkillType() == JobSkillType.PREFERRED)
-                .map(JobSkillEntity::getSkillId)
-                .collect(Collectors.toSet());
+        final Set<Long> requiredSkillIds = filterSkillIds(skillEntities, JobSkillType.REQUIRED);
+        final Set<Long> preferredSkillIds = filterSkillIds(skillEntities, JobSkillType.PREFERRED);
 
         return this.jobPersistenceMapper.toDomain(entity, requiredSkillIds, preferredSkillIds);
 
     }
 
+    private static Set<Long> filterSkillIds(final List<JobSkillEntity> skillEntities, final JobSkillType type) {
+        return skillEntities.stream()
+                .filter(skill -> skill.getSkillType() == type)
+                .map(JobSkillEntity::getSkillId)
+                .collect(Collectors.toSet());
+    }
+
     private void replaceSkills(final Long jobId, final Set<Long> requiredSkillIds, final Set<Long> preferredSkillIds) {
+
+        final List<JobSkillEntity> existingRows = this.springDataJobSkillJpaRepository.findAllByJobId(jobId);
+        final Set<Long> existingRequiredSkillIds = filterSkillIds(existingRows, JobSkillType.REQUIRED);
+        final Set<Long> existingPreferredSkillIds = filterSkillIds(existingRows, JobSkillType.PREFERRED);
+
+        if (existingRequiredSkillIds.equals(requiredSkillIds) && existingPreferredSkillIds.equals(preferredSkillIds)) {
+            return;
+        }
 
         this.springDataJobSkillJpaRepository.deleteAllByJobId(jobId);
 
         final List<JobSkillEntity> rows = new ArrayList<>();
+        final LocalDateTime now = LocalDateTime.now();
 
         requiredSkillIds.forEach(skillId -> rows.add(JobSkillEntity.builder()
                 .jobId(jobId)
                 .skillId(skillId)
                 .skillType(JobSkillType.REQUIRED)
+                .createdAt(now)
                 .build()));
 
         preferredSkillIds.forEach(skillId -> rows.add(JobSkillEntity.builder()
                 .jobId(jobId)
                 .skillId(skillId)
                 .skillType(JobSkillType.PREFERRED)
+                .createdAt(now)
                 .build()));
 
         if (rows.isEmpty()) {
