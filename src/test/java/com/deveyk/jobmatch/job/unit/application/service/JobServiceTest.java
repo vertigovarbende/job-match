@@ -17,6 +17,7 @@ import com.deveyk.jobmatch.job.domain.event.JobExpiredEvent;
 import com.deveyk.jobmatch.job.domain.event.JobPublishedEvent;
 import com.deveyk.jobmatch.job.domain.exception.CompanyMembershipRequiredException;
 import com.deveyk.jobmatch.job.domain.exception.JobNotFoundException;
+import com.deveyk.jobmatch.job.domain.exception.JobResourceForbiddenException;
 import com.deveyk.jobmatch.job.domain.model.DraftStatus;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.domain.model.JobStatus;
@@ -134,6 +135,7 @@ class JobServiceTest {
         final Job existing = existingJob(5L, 1L, new DraftStatus());
         when(this.jobRepository.findById(5L)).thenReturn(Optional.of(existing));
         when(this.jobRepository.save(any(Job.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
 
         final UpdateJobCommand command = UpdateJobCommand.builder()
                 .id(5L)
@@ -185,11 +187,42 @@ class JobServiceTest {
     }
 
     @Test
+    @DisplayName("updateJob() job baska sirkete aitse JobResourceForbiddenException firlatir")
+    void updateJob_throwsJobResourceForbiddenException_whenJobBelongsToAnotherCompany() {
+
+        final Job existing = existingJob(20L, 2L, new DraftStatus());
+        when(this.jobRepository.findById(20L)).thenReturn(Optional.of(existing));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
+
+        final UpdateJobCommand command = UpdateJobCommand.builder()
+                .id(20L)
+                .title("Title")
+                .description("description")
+                .seniority(Seniority.MID_SENIOR)
+                .employmentType(EmploymentType.FULL_TIME)
+                .workplaceType(WorkplaceType.REMOTE)
+                .location(VALID_LOCATION)
+                .salaryRange(VALID_SALARY_RANGE)
+                .minimumExperience(3)
+                .expiresAt(LocalDateTime.now().plusDays(30))
+                .requiredSkillIds(Set.of())
+                .preferredSkillIds(Set.of())
+                .build();
+
+        assertThatThrownBy(() -> this.jobService.updateJob(command))
+                .isInstanceOf(JobResourceForbiddenException.class);
+
+        verify(this.jobRepository, never()).save(any());
+
+    }
+
+    @Test
     @DisplayName("getJobById() job bulundugunda dondurur")
     void getJobById_returnsJob_whenFound() {
 
         final Job existing = existingJob(5L, 1L, new DraftStatus());
         when(this.jobRepository.findById(5L)).thenReturn(Optional.of(existing));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
 
         final Job result = this.jobService.getJobById(5L);
 
@@ -209,12 +242,26 @@ class JobServiceTest {
     }
 
     @Test
+    @DisplayName("getJobById() job baska sirkete aitse JobResourceForbiddenException firlatir")
+    void getJobById_throwsJobResourceForbiddenException_whenJobBelongsToAnotherCompany() {
+
+        final Job existing = existingJob(21L, 2L, new DraftStatus());
+        when(this.jobRepository.findById(21L)).thenReturn(Optional.of(existing));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
+
+        assertThatThrownBy(() -> this.jobService.getJobById(21L))
+                .isInstanceOf(JobResourceForbiddenException.class);
+
+    }
+
+    @Test
     @DisplayName("publishJob() job'u PUBLISHED yapar ve JobPublishedEvent yayinlar")
     void publishJob_publishesJobAndEmitsJobPublishedEvent() {
 
         final Job existing = existingJob(7L, 1L, new DraftStatus());
         when(this.jobRepository.findById(7L)).thenReturn(Optional.of(existing));
         when(this.jobRepository.save(any(Job.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
 
         final Job result = this.jobService.publishJob(new PublishJobCommand(7L, "actor-1"));
 
@@ -239,12 +286,28 @@ class JobServiceTest {
     }
 
     @Test
+    @DisplayName("publishJob() job baska sirkete aitse JobResourceForbiddenException firlatir")
+    void publishJob_throwsJobResourceForbiddenException_whenJobBelongsToAnotherCompany() {
+
+        final Job existing = existingJob(22L, 2L, new DraftStatus());
+        when(this.jobRepository.findById(22L)).thenReturn(Optional.of(existing));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
+
+        assertThatThrownBy(() -> this.jobService.publishJob(new PublishJobCommand(22L, "actor-1")))
+                .isInstanceOf(JobResourceForbiddenException.class);
+
+        verify(this.jobRepository, never()).save(any());
+
+    }
+
+    @Test
     @DisplayName("closeJob() PUBLISHED job'u CLOSED yapar ve JobClosedEvent yayinlar")
     void closeJob_closesJobAndEmitsJobClosedEvent() {
 
         final Job existing = existingJob(8L, 1L, new PublishedStatus());
         when(this.jobRepository.findById(8L)).thenReturn(Optional.of(existing));
         when(this.jobRepository.save(any(Job.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
 
         final Job result = this.jobService.closeJob(new CloseJobCommand(8L, "actor-1"));
 
@@ -269,12 +332,28 @@ class JobServiceTest {
     }
 
     @Test
+    @DisplayName("closeJob() job baska sirkete aitse JobResourceForbiddenException firlatir")
+    void closeJob_throwsJobResourceForbiddenException_whenJobBelongsToAnotherCompany() {
+
+        final Job existing = existingJob(23L, 2L, new PublishedStatus());
+        when(this.jobRepository.findById(23L)).thenReturn(Optional.of(existing));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
+
+        assertThatThrownBy(() -> this.jobService.closeJob(new CloseJobCommand(23L, "actor-1")))
+                .isInstanceOf(JobResourceForbiddenException.class);
+
+        verify(this.jobRepository, never()).save(any());
+
+    }
+
+    @Test
     @DisplayName("archiveJob() DRAFT job'u ARCHIVED yapar ve JobArchivedEvent yayinlar")
     void archiveJob_archivesJobAndEmitsJobArchivedEvent() {
 
         final Job existing = existingJob(9L, 1L, new DraftStatus());
         when(this.jobRepository.findById(9L)).thenReturn(Optional.of(existing));
         when(this.jobRepository.save(any(Job.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
 
         final Job result = this.jobService.archiveJob(new ArchiveJobCommand(9L, "actor-1"));
 
@@ -295,6 +374,21 @@ class JobServiceTest {
 
         assertThatThrownBy(() -> this.jobService.archiveJob(new ArchiveJobCommand(404L, "actor-1")))
                 .isInstanceOf(JobNotFoundException.class);
+
+    }
+
+    @Test
+    @DisplayName("archiveJob() job baska sirkete aitse JobResourceForbiddenException firlatir")
+    void archiveJob_throwsJobResourceForbiddenException_whenJobBelongsToAnotherCompany() {
+
+        final Job existing = existingJob(24L, 2L, new DraftStatus());
+        when(this.jobRepository.findById(24L)).thenReturn(Optional.of(existing));
+        when(this.currentCompanyFacade.resolveCurrentCompanyId()).thenReturn(Optional.of(1L));
+
+        assertThatThrownBy(() -> this.jobService.archiveJob(new ArchiveJobCommand(24L, "actor-1")))
+                .isInstanceOf(JobResourceForbiddenException.class);
+
+        verify(this.jobRepository, never()).save(any());
 
     }
 
