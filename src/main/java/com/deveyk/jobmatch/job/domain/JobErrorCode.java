@@ -50,6 +50,13 @@ public enum JobErrorCode implements ErrorCode {
             "COMPANY_MEMBERSHIP_REQUIRED",
             403,
             "You must belong to a company before creating a job."
+    ),
+
+    JOB_RESOURCE_FORBIDDEN(
+            "JOB_007",
+            "JOB_RESOURCE_FORBIDDEN",
+            403,
+            "The requested job does not belong to your company."
     );
 
     private final String code;

@@ -17,14 +17,13 @@ import com.deveyk.jobmatch.job.domain.event.JobExpiredEvent;
 import com.deveyk.jobmatch.job.domain.event.JobPublishedEvent;
 import com.deveyk.jobmatch.job.domain.exception.CompanyMembershipRequiredException;
 import com.deveyk.jobmatch.job.domain.exception.JobNotFoundException;
+import com.deveyk.jobmatch.job.domain.exception.JobResourceForbiddenException;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.shared.domain.model.JmPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,12 +69,12 @@ public class JobService implements JobUseCase {
 
     @Override
     @Transactional
-    @PreAuthorize("@jobOwnershipPolicy.isOwner(#command.id())")
     public Job updateJob(final UpdateJobCommand command) {
 
         log.debug("Updating job: id={}", command.id());
 
         final Job job = this.findByIdOrThrow(command.id());
+        this.checkOwnershipOrThrow(job);
 
         job.updateDetails(
                 command.title(),
@@ -100,22 +99,24 @@ public class JobService implements JobUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("@jobOwnershipPolicy.isOwner(#jobId)")
-    public Job getJobById(@P("jobId") final Long jobId) {
+    public Job getJobById(final Long jobId) {
 
         log.debug("Fetching job: id={}", jobId);
 
-        return this.findByIdOrThrow(jobId);
+        final Job job = this.findByIdOrThrow(jobId);
+        this.checkOwnershipOrThrow(job);
+
+        return job;
     }
 
     @Override
     @Transactional
-    @PreAuthorize("@jobOwnershipPolicy.isOwner(#command.id())")
     public Job publishJob(final PublishJobCommand command) {
 
         log.debug("Publishing job: id={}", command.id());
 
         final Job job = this.findByIdOrThrow(command.id());
+        this.checkOwnershipOrThrow(job);
         job.publish();
         final Job saved = this.jobRepository.save(job);
 
@@ -128,12 +129,12 @@ public class JobService implements JobUseCase {
 
     @Override
     @Transactional
-    @PreAuthorize("@jobOwnershipPolicy.isOwner(#command.id())")
     public Job closeJob(final CloseJobCommand command) {
 
         log.debug("Closing job: id={}", command.id());
 
         final Job job = this.findByIdOrThrow(command.id());
+        this.checkOwnershipOrThrow(job);
         job.close();
         final Job saved = this.jobRepository.save(job);
 
@@ -146,12 +147,12 @@ public class JobService implements JobUseCase {
 
     @Override
     @Transactional
-    @PreAuthorize("@jobOwnershipPolicy.isOwner(#command.id())")
     public Job archiveJob(final ArchiveJobCommand command) {
 
         log.debug("Archiving job: id={}", command.id());
 
         final Job job = this.findByIdOrThrow(command.id());
+        this.checkOwnershipOrThrow(job);
         job.archive();
         final Job saved = this.jobRepository.save(job);
 
@@ -203,6 +204,17 @@ public class JobService implements JobUseCase {
     private Job findByIdOrThrow(final Long id) {
         return this.jobRepository.findById(id)
                 .orElseThrow(() -> new JobNotFoundException(id));
+    }
+
+    private void checkOwnershipOrThrow(final Job job) {
+
+        final Long companyId = this.currentCompanyFacade.resolveCurrentCompanyId()
+                .orElseThrow(CompanyMembershipRequiredException::new);
+
+        if (!job.isOwnedBy(companyId)) {
+            throw new JobResourceForbiddenException(job.getId(), companyId);
+        }
+
     }
 
 }
