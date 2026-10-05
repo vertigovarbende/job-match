@@ -10,7 +10,6 @@ import com.deveyk.jobmatch.shared.domain.WorkplaceType;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
 import com.deveyk.jobmatch.shared.domain.model.Location;
 import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -21,7 +20,6 @@ import java.util.Set;
 
 @Getter
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 public final class Job extends JmBaseDomain {
 
     private final Long id;

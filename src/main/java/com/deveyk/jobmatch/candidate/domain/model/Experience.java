@@ -4,7 +4,6 @@ import com.deveyk.jobmatch.shared.domain.EmploymentType;
 import com.deveyk.jobmatch.candidate.domain.exception.CandidateFieldInvalidException;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
 import com.deveyk.jobmatch.shared.domain.model.Location;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -13,7 +12,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 public final class Experience extends JmBaseDomain implements Ongoing {
 
     private final Long id;

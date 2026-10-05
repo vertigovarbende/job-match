@@ -3,7 +3,6 @@ package com.deveyk.jobmatch.identity.domain.model;
 import com.deveyk.jobmatch.identity.domain.Role;
 import com.deveyk.jobmatch.shared.domain.Guard;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
@@ -15,7 +14,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 public final class JmUser extends JmBaseDomain {
 
     private final Long id;
@@ -28,7 +26,6 @@ public final class JmUser extends JmBaseDomain {
 
     @Getter
     @SuperBuilder
-    @EqualsAndHashCode(callSuper = true)
     public static class LoginAttempt extends JmBaseDomain {
 
         private Long id;

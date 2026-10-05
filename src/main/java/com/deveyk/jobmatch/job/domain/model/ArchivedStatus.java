@@ -1,7 +1,9 @@
 package com.deveyk.jobmatch.job.domain.model;
 
 import com.deveyk.jobmatch.job.domain.exception.InvalidJobStatusTransitionException;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public final class ArchivedStatus implements JobStatus {
 
     @Override
