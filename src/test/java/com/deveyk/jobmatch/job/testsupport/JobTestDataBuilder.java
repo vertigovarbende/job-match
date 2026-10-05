@@ -1,6 +1,8 @@
 package com.deveyk.jobmatch.job.testsupport;
 
+import com.deveyk.jobmatch.job.domain.model.DraftStatus;
 import com.deveyk.jobmatch.job.domain.model.Job;
+import com.deveyk.jobmatch.job.domain.model.JobStatus;
 import com.deveyk.jobmatch.shared.domain.EmploymentType;
 import com.deveyk.jobmatch.shared.domain.Seniority;
 import com.deveyk.jobmatch.shared.domain.WorkplaceType;
@@ -11,7 +13,6 @@ import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
-
 
 public final class JobTestDataBuilder {
 
@@ -27,6 +28,9 @@ public final class JobTestDataBuilder {
     private LocalDateTime expiresAt = LocalDateTime.now().plusDays(30);
     private Set<Long> requiredSkillIds = Set.of();
     private Set<Long> preferredSkillIds = Set.of();
+    private Long id = null;
+    private JobStatus status = new DraftStatus();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     private JobTestDataBuilder() {
 
@@ -96,6 +100,21 @@ public final class JobTestDataBuilder {
         return this;
     }
 
+    public JobTestDataBuilder withId(final Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public JobTestDataBuilder withStatus(final JobStatus status) {
+        this.status = status;
+        return this;
+    }
+
+    public JobTestDataBuilder withCreatedAt(final LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
     public Job build() {
         return Job.create(
                 this.companyId,
@@ -111,6 +130,31 @@ public final class JobTestDataBuilder {
                 this.requiredSkillIds,
                 this.preferredSkillIds
         );
+    }
+
+    /**
+     * Veritabanindan okunmus (rehydrate edilmis) bir Job uretir: Job.create() dogrulamalarini
+     * ve normalizasyonunu atlar, id/status/createdAt degerlerini oldugu gibi kullanir.
+     * Yeni Job (id=null, DRAFT) icin build() kullanilmalidir.
+     */
+    public Job buildPersisted() {
+        return Job.builder()
+                .id(this.id)
+                .companyId(this.companyId)
+                .title(this.title)
+                .description(this.description)
+                .seniority(this.seniority)
+                .employmentType(this.employmentType)
+                .workplaceType(this.workplaceType)
+                .location(this.location)
+                .salaryRange(this.salaryRange)
+                .minimumExperience(this.minimumExperience)
+                .expiresAt(this.expiresAt)
+                .requiredSkillIds(this.requiredSkillIds)
+                .preferredSkillIds(this.preferredSkillIds)
+                .status(this.status)
+                .createdAt(this.createdAt)
+                .build();
     }
 
 }

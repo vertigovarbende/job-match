@@ -4,7 +4,9 @@ import com.deveyk.jobmatch.job.domain.exception.DuplicateSkillReferenceException
 import com.deveyk.jobmatch.job.domain.exception.InvalidJobStatusTransitionException;
 import com.deveyk.jobmatch.job.domain.exception.JobFieldInvalidException;
 import com.deveyk.jobmatch.job.domain.exception.JobNotReadyForPublishException;
+import com.deveyk.jobmatch.job.domain.model.DraftStatus;
 import com.deveyk.jobmatch.job.domain.model.Job;
+import com.deveyk.jobmatch.job.domain.model.JobStatus;
 import com.deveyk.jobmatch.job.domain.model.JobStatusType;
 import com.deveyk.jobmatch.job.testsupport.JobTestDataBuilder;
 import com.deveyk.jobmatch.shared.domain.EmploymentType;
@@ -27,9 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class JobTest {
 
     private static final Location VALID_LOCATION = new Location("Turkiye", "Istanbul");
-    private static final SalaryRange VALID_SALARY_RANGE = new SalaryRange(
-            new Money(BigDecimal.valueOf(50000), "USD"),
-            new Money(BigDecimal.valueOf(80000), "USD"));
+    private static final SalaryRange VALID_SALARY_RANGE = new SalaryRange(new Money(BigDecimal.valueOf(50000), "USD"), new Money(BigDecimal.valueOf(80000), "USD"));
 
     @Test
     @DisplayName("create() tum alanlari set eder, status'u DRAFT yapar ve id'yi null birakir")
@@ -75,7 +75,10 @@ class JobTest {
     @DisplayName("create() title null oldugunda JobFieldInvalidException firlatir")
     void create_throwsJobFieldInvalidException_whenTitleIsNull() {
 
-        assertThatThrownBy(() -> createJob(null, VALID_LOCATION, VALID_SALARY_RANGE, EmploymentType.FULL_TIME, WorkplaceType.REMOTE))
+        assertThatThrownBy(() -> JobTestDataBuilder.aJob()
+                .withTitle(null)
+                .build()
+        )
                 .isInstanceOf(JobFieldInvalidException.class)
                 .hasMessageContaining("title");
 
@@ -85,7 +88,10 @@ class JobTest {
     @DisplayName("create() title bos (blank) oldugunda JobFieldInvalidException firlatir")
     void create_throwsJobFieldInvalidException_whenTitleIsBlank() {
 
-        assertThatThrownBy(() -> createJob("   ", VALID_LOCATION, VALID_SALARY_RANGE, EmploymentType.FULL_TIME, WorkplaceType.REMOTE))
+        assertThatThrownBy(() -> JobTestDataBuilder.aJob()
+                .withTitle("   ")
+                .build()
+        )
                 .isInstanceOf(JobFieldInvalidException.class)
                 .hasMessageContaining("title");
 
@@ -97,7 +103,8 @@ class JobTest {
 
         assertThatThrownBy(() -> JobTestDataBuilder.aJob()
                 .withCompanyId(null)
-                .build())
+                .build()
+        )
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("companyId");
 
@@ -124,7 +131,8 @@ class JobTest {
         assertThatThrownBy(() -> JobTestDataBuilder.aJob()
                 .withRequiredSkillIds(Set.of(1L, 2L))
                 .withPreferredSkillIds(Set.of(2L, 3L))
-                .build())
+                .build()
+        )
                 .isInstanceOf(DuplicateSkillReferenceException.class)
                 .hasMessageContaining("2");
 
@@ -252,7 +260,9 @@ class JobTest {
     @DisplayName("publish() location eksikken JobNotReadyForPublishException firlatir")
     void publish_throwsJobNotReadyForPublishException_whenLocationIsMissing() {
 
-        final Job job = createJob("Backend Developer", null, VALID_SALARY_RANGE, EmploymentType.FULL_TIME, WorkplaceType.REMOTE);
+        final Job job = JobTestDataBuilder.aJob()
+                .withLocation(null)
+                .build();
 
         assertThatThrownBy(job::publish).isInstanceOf(JobNotReadyForPublishException.class);
 
@@ -262,7 +272,9 @@ class JobTest {
     @DisplayName("publish() salaryRange eksikken JobNotReadyForPublishException firlatir")
     void publish_throwsJobNotReadyForPublishException_whenSalaryRangeIsMissing() {
 
-        final Job job = createJob("Backend Developer", VALID_LOCATION, null, EmploymentType.FULL_TIME, WorkplaceType.REMOTE);
+        final Job job = JobTestDataBuilder.aJob()
+                .withSalaryRange(null)
+                .build();
 
         assertThatThrownBy(job::publish).isInstanceOf(JobNotReadyForPublishException.class);
 
@@ -272,7 +284,9 @@ class JobTest {
     @DisplayName("publish() employmentType eksikken JobNotReadyForPublishException firlatir")
     void publish_throwsJobNotReadyForPublishException_whenEmploymentTypeIsMissing() {
 
-        final Job job = createJob("Backend Developer", VALID_LOCATION, VALID_SALARY_RANGE, null, WorkplaceType.REMOTE);
+        final Job job = JobTestDataBuilder.aJob()
+                .withEmploymentType(null)
+                .build();
 
         assertThatThrownBy(job::publish).isInstanceOf(JobNotReadyForPublishException.class);
 
@@ -282,7 +296,9 @@ class JobTest {
     @DisplayName("publish() workplaceType eksikken JobNotReadyForPublishException firlatir")
     void publish_throwsJobNotReadyForPublishException_whenWorkplaceTypeIsMissing() {
 
-        final Job job = createJob("Backend Developer", VALID_LOCATION, VALID_SALARY_RANGE, EmploymentType.FULL_TIME, null);
+        final Job job = JobTestDataBuilder.aJob()
+                .withWorkplaceType(null)
+                .build();
 
         assertThatThrownBy(job::publish).isInstanceOf(JobNotReadyForPublishException.class);
 
@@ -319,25 +335,75 @@ class JobTest {
 
     }
 
-    private static Job jobReadyToPublish() {
-        return createJob("Backend Developer", VALID_LOCATION, VALID_SALARY_RANGE, EmploymentType.FULL_TIME, WorkplaceType.REMOTE);
+    @Test
+    @DisplayName("equals() id ayniysa baslik, status ve timestamp farkli olsa bile true doner")
+    void equals_returnsTrue_whenIdsMatchDespiteDifferentFields() {
+
+        final Job first = JobTestDataBuilder.aJob()
+                .withId(1L)
+                .withTitle("Backend Developer")
+                .withCreatedAt(LocalDateTime.of(2026, 1, 1, 10, 0))
+                .buildPersisted();
+
+        final Job second = JobTestDataBuilder.aJob()
+                .withId(1L)
+                .withTitle("Frontend Developer")
+                .withCreatedAt(LocalDateTime.of(2026, 2, 1, 10, 0))
+                .buildPersisted();
+
+        assertThat(first).isEqualTo(second);
+        assertThat(first).hasSameHashCodeAs(second);
+
     }
 
-    private static Job createJob(final String title,
-                                  final Location location,
-                                  final SalaryRange salaryRange,
-                                  final EmploymentType employmentType,
-                                  final WorkplaceType workplaceType) {
-        return JobTestDataBuilder.aJob()
-                .withTitle(title)
-                .withDescription("Job description")
-                .withEmploymentType(employmentType)
-                .withWorkplaceType(workplaceType)
-                .withLocation(location)
-                .withSalaryRange(salaryRange)
-                .withRequiredSkillIds(Set.of(1L, 2L))
-                .withPreferredSkillIds(Set.of(3L, 4L))
-                .build();
+    @Test
+    @DisplayName("equals() id farkliysa diger tum alanlar ayni olsa bile false doner")
+    void equals_returnsFalse_whenIdsDiffer() {
+
+        final JobStatus sharedStatus = new DraftStatus();
+        final LocalDateTime createdAt = LocalDateTime.of(2026, 1, 1, 10, 0);
+
+        final Job first = JobTestDataBuilder.aJob()
+                .withId(1L)
+                .withStatus(sharedStatus)
+                .withCreatedAt(createdAt)
+                .buildPersisted();
+
+        final Job second = JobTestDataBuilder.aJob()
+                .withId(2L)
+                .withStatus(sharedStatus)
+                .withCreatedAt(createdAt)
+                .buildPersisted();
+
+        assertThat(first).isNotEqualTo(second);
+
+    }
+
+    @Test
+    @DisplayName("equals() id'si null (kaydedilmemis) iki job tum alanlari ayni olsa bile false doner")
+    void equals_returnsFalse_whenBothJobsAreUnsaved() {
+
+        final JobStatus sharedStatus = new DraftStatus();
+        final LocalDateTime createdAt = LocalDateTime.of(2026, 1, 1, 10, 0);
+
+        final Job first = JobTestDataBuilder.aJob()
+                .withId(null)
+                .withStatus(sharedStatus)
+                .withCreatedAt(createdAt)
+                .buildPersisted();
+
+        final Job second = JobTestDataBuilder.aJob()
+                .withId(null)
+                .withStatus(sharedStatus)
+                .withCreatedAt(createdAt)
+                .buildPersisted();
+
+        assertThat(first).isNotEqualTo(second);
+
+    }
+
+    private static Job jobReadyToPublish() {
+        return JobTestDataBuilder.aJob().build();
     }
 
 }
