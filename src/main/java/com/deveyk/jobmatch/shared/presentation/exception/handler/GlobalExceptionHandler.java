@@ -13,7 +13,6 @@ import com.deveyk.jobmatch.shared.presentation.response.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -72,7 +71,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    // ===== Katman 2 — Aile bazlı custom exception'lar (statik statü, ErrorCode instance'tan okunur) =====
+    // ===== Katman 2 — Aile bazlı custom exception'lar (statik statü, ailenin doğası belirler) =====
 
     @ExceptionHandler(DomainRuleViolationException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -152,16 +151,17 @@ public class GlobalExceptionHandler {
     }
 
 
-    // ===== Katman 3 — Genel JobMatchException fallback'i (dinamik statü) =====
+    // ===== Katman 3 — Genel JobMatchException fallback'i (hiçbir aileye oturmayan, statik 500) =====
 
     @ExceptionHandler(JobMatchException.class)
-    public ResponseEntity<ErrorResponse> handleJobMatchException(final JobMatchException exception) {
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleJobMatchException(final JobMatchException exception) {
 
         final ErrorResponse errorResponse = this.toErrorResponse(exception);
 
         this.logException(exception, errorResponse);
 
-        return ResponseEntity.status(HttpStatus.valueOf(exception.getErrorCode().status())).body(errorResponse);
+        return errorResponse;
     }
 
 

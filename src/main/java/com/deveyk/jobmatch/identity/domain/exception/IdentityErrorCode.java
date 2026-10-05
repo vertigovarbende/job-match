@@ -13,20 +13,17 @@ public enum IdentityErrorCode implements ErrorCode {
     INVALID_BUSINESS_ROLE_CLAIM(
             "IDN_001",
             "INVALID_BUSINESS_ROLE_CLAIM",
-            422,
             "JWT must contain exactly one business role (CANDIDATE, EMPLOYER, or ADMIN)."
     ),
 
     JM_USER_ALREADY_EXISTS(
             "IDN_002",
             "JM_USER_ALREADY_EXISTS",
-            409,
             "A jm_user record already exists for this Keycloak subject id."
     );
 
     private final String code;
     private final String header;
-    private final int status;
     private final String defaultMessage;
 
 }
