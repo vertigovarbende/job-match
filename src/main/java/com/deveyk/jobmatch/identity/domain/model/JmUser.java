@@ -4,7 +4,6 @@ import com.deveyk.jobmatch.identity.domain.Role;
 import com.deveyk.jobmatch.shared.domain.Guard;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -12,7 +11,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-@Setter
 @SuperBuilder
 public final class JmUser extends JmBaseDomain {
 

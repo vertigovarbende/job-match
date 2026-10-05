@@ -1,11 +1,13 @@
 package com.deveyk.jobmatch.architecture;
 
+import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
@@ -67,5 +69,18 @@ class ArchitectureTest {
     static final ArchRule top_level_packages_should_be_free_of_cycles = slices()
             .matching("com.deveyk.jobmatch.(*)..")
             .should().beFreeOfCycles();
+
+    /**
+     * Domain entity/aggregate siniflarinda (JmBaseDomain'den tureyenler) setter bulunmaz; mutasyon yalnizca
+     * anlamli domain metodlari uzerinden yapilir (bkz. ADR-010, ADR-012 Consequences). Lombok'un @Setter'i da
+     * derlenmis bytecode'da setX metodu urettigi icin bu kural onu da yakalar. Kural bilerek JmBaseDomain
+     * ailesiyle sinirlidir: domain.model altindaki JmPage/JmSort gibi sayfalama tipleri entity degildir
+     * (JmPageable istek DTO'su JmSort'u extend eder ve setter'lara ihtiyac duyabilir).
+     */
+    @ArchTest
+    static final ArchRule domain_models_should_not_expose_setters = noMethods()
+            .that().areDeclaredInClassesThat().areAssignableTo(JmBaseDomain.class)
+            .should().haveNameMatching("set[A-Z].*")
+            .because("Domain modelinde setter yoktur, mutasyon domain metodlariyla yapilir (bkz. ADR-010, ADR-012).");
 
 }
