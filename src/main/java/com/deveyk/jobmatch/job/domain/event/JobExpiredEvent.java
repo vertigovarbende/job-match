@@ -3,6 +3,7 @@ package com.deveyk.jobmatch.job.domain.event;
 import com.deveyk.jobmatch.audit.domain.AuditAction;
 import com.deveyk.jobmatch.audit.domain.event.AuditableDomainEvent;
 import com.deveyk.jobmatch.job.domain.JobAuditAction;
+import com.deveyk.jobmatch.job.domain.JobTargetType;
 import com.deveyk.jobmatch.search.domain.event.IndexOperation;
 import com.deveyk.jobmatch.search.domain.event.SearchIndexableEvent;
 
@@ -27,7 +28,7 @@ public record JobExpiredEvent(String targetId, Instant occurredAt) implements Au
 
     @Override
     public String targetType() {
-        return "JOB";
+        return JobTargetType.JOB;
     }
 
     @Override

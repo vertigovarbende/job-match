@@ -1,6 +1,7 @@
 package com.deveyk.jobmatch.job.infrastructure.elasticsearch.adapter;
 
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
+import com.deveyk.jobmatch.job.domain.JobTargetType;
 import com.deveyk.jobmatch.job.domain.exception.JobNotFoundException;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.infrastructure.elasticsearch.JobDocument;
@@ -22,7 +23,7 @@ public class JobSearchIndexer implements SearchIndexer<JobDocument> {
 
     @Override
     public String targetType() {
-        return "JOB";
+        return JobTargetType.JOB;
     }
 
     @Override
