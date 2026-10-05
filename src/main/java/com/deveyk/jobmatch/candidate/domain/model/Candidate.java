@@ -3,7 +3,6 @@ package com.deveyk.jobmatch.candidate.domain.model;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
 import com.deveyk.jobmatch.shared.domain.model.Location;
 import com.deveyk.jobmatch.shared.domain.model.SalaryRange;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -12,7 +11,6 @@ import java.util.Objects;
 
 @Getter
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 public final class Candidate extends JmBaseDomain {
 
     private final Long id;

@@ -1,7 +1,6 @@
 package com.deveyk.jobmatch.company.domain.model;
 
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -9,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 public final class CompanyMembership extends JmBaseDomain {
 
     private final Long id;

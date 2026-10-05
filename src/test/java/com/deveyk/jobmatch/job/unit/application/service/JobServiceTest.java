@@ -23,6 +23,7 @@ import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.domain.model.JobStatus;
 import com.deveyk.jobmatch.job.domain.model.JobStatusType;
 import com.deveyk.jobmatch.job.domain.model.PublishedStatus;
+import com.deveyk.jobmatch.job.testsupport.JobTestDataBuilder;
 import com.deveyk.jobmatch.shared.domain.EmploymentType;
 import com.deveyk.jobmatch.shared.domain.Seniority;
 import com.deveyk.jobmatch.shared.domain.WorkplaceType;
@@ -484,23 +485,11 @@ class JobServiceTest {
     }
 
     private static Job existingJob(final Long id, final Long companyId, final JobStatus status) {
-        return Job.builder()
-                .id(id)
-                .companyId(companyId)
-                .title("Backend Developer")
-                .description("description")
-                .seniority(Seniority.MID_SENIOR)
-                .employmentType(EmploymentType.FULL_TIME)
-                .workplaceType(WorkplaceType.REMOTE)
-                .location(VALID_LOCATION)
-                .salaryRange(VALID_SALARY_RANGE)
-                .minimumExperience(3)
-                .expiresAt(LocalDateTime.now().plusDays(30))
-                .requiredSkillIds(Set.of())
-                .preferredSkillIds(Set.of())
-                .status(status)
-                .createdAt(LocalDateTime.now())
-                .build();
+        return JobTestDataBuilder.aJob()
+                .withId(id)
+                .withCompanyId(companyId)
+                .withStatus(status)
+                .buildPersisted();
     }
 
 }

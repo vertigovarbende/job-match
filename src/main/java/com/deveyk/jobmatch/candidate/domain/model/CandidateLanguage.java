@@ -2,7 +2,6 @@ package com.deveyk.jobmatch.candidate.domain.model;
 
 import com.deveyk.jobmatch.candidate.domain.ProficiencyLevel;
 import com.deveyk.jobmatch.shared.domain.model.JmBaseDomain;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -11,7 +10,6 @@ import java.util.Objects;
 
 @Getter
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 public final class CandidateLanguage extends JmBaseDomain {
 
     private final Long id;
