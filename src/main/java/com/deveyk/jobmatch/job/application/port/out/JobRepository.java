@@ -22,6 +22,8 @@ public interface JobRepository {
 
     JmPage<JobSearchResult> findAllPublished(JobSearchCriteria criteria, Pageable pageable);
 
+    List<Long> findPublishedJobIds(Pageable pageable);
+
     JmPage<Job> findAllForCompany(Long companyId, JobListCriteria criteria, Pageable pageable);
 
 }

@@ -75,6 +75,11 @@ public class JobRepositoryAdapter implements JobRepository {
     }
 
     @Override
+    public List<Long> findPublishedJobIds(final Pageable pageable) {
+        return this.springDataJobJpaRepository.findIdsByStatus(JobStatusType.PUBLISHED, pageable);
+    }
+
+    @Override
     public JmPage<Job> findAllForCompany(final Long companyId, final JobListCriteria criteria, final Pageable pageable) {
 
         final JobListFilter filter = JobListFilter.builder()
