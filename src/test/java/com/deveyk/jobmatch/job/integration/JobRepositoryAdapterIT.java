@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -119,6 +120,72 @@ class JobRepositoryAdapterIT extends TestContainerConfiguration {
         final List<JobSkillEntity> rows = this.springDataJobSkillJpaRepository.findAllByJobId(saved.getId());
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0).getSkillId()).isEqualTo(this.skillIdB);
+
+    }
+
+    @Test
+    @DisplayName("findPublishedJobIds() yalnizca PUBLISHED job id'lerini id'ye gore artan sirada doner")
+    void findPublishedJobIds_returnsOnlyPublishedJobIdsInAscendingOrder() {
+
+        // given
+        final Job draft = this.jobRepositoryAdapter.save(this.aDraftJob());
+        final Job published = this.savePublishedJob();
+        final Job closed = this.saveClosedJob();
+        final Job anotherPublished = this.savePublishedJob();
+
+        // when
+        final List<Long> ids = this.jobRepositoryAdapter.findPublishedJobIds(PageRequest.of(0, 1000));
+
+        // then
+        assertThat(ids)
+                .contains(published.getId(), anotherPublished.getId())
+                .doesNotContain(draft.getId(), closed.getId())
+                .isSorted();
+
+    }
+
+    @Test
+    @DisplayName("findPublishedJobIds() sayfalar arasinda ayni sirayi korur ve kayit atlamaz")
+    void findPublishedJobIds_pagesConsistentlyWithTheFullList() {
+
+        // given
+        this.savePublishedJob();
+        this.savePublishedJob();
+
+        final List<Long> all = this.jobRepositoryAdapter.findPublishedJobIds(PageRequest.of(0, 1000));
+
+        // when
+        final List<Long> firstPage = this.jobRepositoryAdapter.findPublishedJobIds(PageRequest.of(0, 1));
+        final List<Long> secondPage = this.jobRepositoryAdapter.findPublishedJobIds(PageRequest.of(1, 1));
+
+        // then
+        assertThat(all).hasSizeGreaterThanOrEqualTo(2);
+        assertThat(firstPage).containsExactly(all.get(0));
+        assertThat(secondPage).containsExactly(all.get(1));
+
+    }
+
+    private Job aDraftJob() {
+        return JobTestDataBuilder.aJob()
+                .withCompanyId(this.companyId)
+                .build();
+    }
+
+    private Job savePublishedJob() {
+
+        final Job saved = this.jobRepositoryAdapter.save(this.aDraftJob());
+        saved.publish();
+
+        return this.jobRepositoryAdapter.save(saved);
+
+    }
+
+    private Job saveClosedJob() {
+
+        final Job published = this.savePublishedJob();
+        published.close();
+
+        return this.jobRepositoryAdapter.save(published);
 
     }
 

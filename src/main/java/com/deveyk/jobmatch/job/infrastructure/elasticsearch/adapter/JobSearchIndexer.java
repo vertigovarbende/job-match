@@ -10,7 +10,10 @@ import com.deveyk.jobmatch.job.infrastructure.elasticsearch.repository.JobElasti
 import com.deveyk.jobmatch.search.domain.indexer.SearchIndexer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -46,6 +49,19 @@ public class JobSearchIndexer implements SearchIndexer<JobDocument> {
     public void remove(final String targetId) {
         this.jobElasticsearchRepository.deleteById(targetId);
         log.debug("Job removed from Elasticsearch: id={}", targetId);
+    }
+
+    @Override
+    public void removeAll() {
+        this.jobElasticsearchRepository.deleteAll();
+        log.debug("All jobs removed from Elasticsearch");
+    }
+
+    @Override
+    public List<String> findIndexableTargetIds(final int page, final int size) {
+        return this.jobRepository.findPublishedJobIds(PageRequest.of(page, size)).stream()
+                .map(String::valueOf)
+                .toList();
     }
 
 }
