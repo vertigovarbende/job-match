@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/jobs/search").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/skills").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/languages").permitAll()
+                        .requestMatchers("/internal/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(this.jwtAuthenticationConverter)))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
