@@ -1,8 +1,8 @@
 package com.deveyk.jobmatch.identity.application;
 
+import com.deveyk.jobmatch.identity.application.port.out.JmUserRepository;
 import com.deveyk.jobmatch.identity.domain.exception.JmUserAlreadyExistsException;
 import com.deveyk.jobmatch.identity.domain.model.JmUser;
-import com.deveyk.jobmatch.identity.domain.repository.JmUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

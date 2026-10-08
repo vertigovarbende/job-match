@@ -1,4 +1,4 @@
-package com.deveyk.jobmatch.audit.domain.repository;
+package com.deveyk.jobmatch.audit.application.port.out;
 
 import com.deveyk.jobmatch.audit.domain.model.AuditLog;
 

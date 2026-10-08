@@ -1,8 +1,8 @@
 package com.deveyk.jobmatch.audit.infrastructure.messaging.adapter;
 
+import com.deveyk.jobmatch.audit.application.port.out.AuditRepository;
 import com.deveyk.jobmatch.audit.domain.event.AuditableDomainEvent;
 import com.deveyk.jobmatch.audit.domain.model.AuditLog;
-import com.deveyk.jobmatch.audit.domain.repository.AuditRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

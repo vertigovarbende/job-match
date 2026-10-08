@@ -6,6 +6,7 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
@@ -82,5 +83,19 @@ class ArchitectureTest {
             .that().areDeclaredInClassesThat().areAssignableTo(JmBaseDomain.class)
             .should().haveNameMatching("set[A-Z].*")
             .because("Domain modelinde setter yoktur, mutasyon domain metodlariyla yapilir (bkz. ADR-010, ADR-012).");
+
+    /**
+     * Repository port'lari (persistence soyutlamalari) tum modullerde ayni konumda durur:
+     * "..application.port.out..". Domain katmaninda ya da baska bir pakette port arayuzu tanimlanmaz
+     * (bkz. REFACTOR_02 madde 6). Infrastructure altindaki Spring Data arayuzleri (SpringData*JpaRepository,
+     * *ElasticsearchRepository) port degil, framework arayuzleridir; kural onlari kapsamaz.
+     */
+    @ArchTest
+    static final ArchRule repository_ports_should_reside_in_application_port_out = classes()
+            .that().areInterfaces()
+            .and().haveSimpleNameEndingWith("Repository")
+            .and().resideOutsideOfPackage("..infrastructure..")
+            .should().resideInAPackage("..application.port.out..")
+            .because("Port'lar butun modullerde application/port/out altinda toplanir (bkz. REFACTOR_02 madde 6).");
 
 }
