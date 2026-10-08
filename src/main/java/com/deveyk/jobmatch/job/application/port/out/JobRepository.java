@@ -1,8 +1,6 @@
 package com.deveyk.jobmatch.job.application.port.out;
 
 import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
-import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
-import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.domain.model.JobStatusType;
 import com.deveyk.jobmatch.shared.domain.model.JmPage;
@@ -19,8 +17,6 @@ public interface JobRepository {
     Job save(Job job);
 
     List<Job> findAllByStatusAndExpiresAtBefore(JobStatusType status, LocalDateTime cutoff);
-
-    JmPage<JobSearchResult> findAllPublished(JobSearchCriteria criteria, Pageable pageable);
 
     List<Long> findPublishedJobIds(Pageable pageable);
 

@@ -11,6 +11,7 @@ import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
+import com.deveyk.jobmatch.job.application.port.out.JobSearchPort;
 import com.deveyk.jobmatch.job.domain.event.JobArchivedEvent;
 import com.deveyk.jobmatch.job.domain.event.JobClosedEvent;
 import com.deveyk.jobmatch.job.domain.event.JobExpiredEvent;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class JobService implements JobUseCase {
 
     private final JobRepository jobRepository;
+    private final JobSearchPort jobSearchPort;
     private final CurrentCompanyFacade currentCompanyFacade;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -186,7 +188,7 @@ public class JobService implements JobUseCase {
 
         log.debug("Searching published jobs");
 
-        return this.jobRepository.findAllPublished(criteria, pageable);
+        return this.jobSearchPort.search(criteria, pageable);
     }
 
     @Override

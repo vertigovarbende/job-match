@@ -98,4 +98,15 @@ class ArchitectureTest {
             .should().resideInAPackage("..application.port.out..")
             .because("Port'lar butun modullerde application/port/out altinda toplanir (bkz. REFACTOR_02 madde 6).");
 
+    /**
+     * Persistence (Postgres) adapter'lari Elasticsearch adapter'larina bagimli olmaz: her teknoloji kendi
+     * paketinde yasar ve ikisi yalnizca application katmanindaki port'lar uzerinden birlestirilir
+     * (bkz. REFACTOR_02 madde 7).
+     */
+    @ArchTest
+    static final ArchRule persistence_should_not_depend_on_elasticsearch = noClasses()
+            .that().resideInAPackage("..infrastructure.persistence..")
+            .should().dependOnClassesThat().resideInAPackage("..infrastructure.elasticsearch..")
+            .because("Postgres ve Elasticsearch adapter'lari birbirini bilmez; yalnizca port'lar uzerinden konusulur (bkz. REFACTOR_02 madde 7).");
+
 }
