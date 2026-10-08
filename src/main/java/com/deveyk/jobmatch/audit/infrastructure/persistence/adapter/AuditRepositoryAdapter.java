@@ -1,7 +1,7 @@
 package com.deveyk.jobmatch.audit.infrastructure.persistence.adapter;
 
+import com.deveyk.jobmatch.audit.application.port.out.AuditRepository;
 import com.deveyk.jobmatch.audit.domain.model.AuditLog;
-import com.deveyk.jobmatch.audit.domain.repository.AuditRepository;
 import com.deveyk.jobmatch.audit.infrastructure.persistence.entity.AuditLogEntity;
 import com.deveyk.jobmatch.audit.infrastructure.persistence.mapper.AuditLogEntityMapper;
 import com.deveyk.jobmatch.audit.infrastructure.persistence.repository.SpringDataAuditJpaRepository;

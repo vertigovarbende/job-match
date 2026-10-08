@@ -1,4 +1,4 @@
-package com.deveyk.jobmatch.identity.domain.repository;
+package com.deveyk.jobmatch.identity.application.port.out;
 
 import com.deveyk.jobmatch.identity.domain.model.JmUser;
 
