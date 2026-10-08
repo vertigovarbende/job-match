@@ -69,10 +69,10 @@ public class JobDocument {
     @Field(type = FieldType.Keyword)
     private JobStatusType status;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime publishedAt;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime expiresAt;
 
     @Field(type = FieldType.Long)
