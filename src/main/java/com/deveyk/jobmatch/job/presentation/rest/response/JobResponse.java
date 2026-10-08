@@ -8,8 +8,6 @@ import com.deveyk.jobmatch.shared.presentation.rest.response.LocationResponse;
 import com.deveyk.jobmatch.shared.presentation.rest.response.SalaryRangeResponse;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public record JobResponse(
@@ -27,8 +25,7 @@ public record JobResponse(
         LocalDateTime publishedAt,
         JobStatusType status,
         Set<Long> requiredSkillIds,
-        Set<Long> preferredSkillIds,
-        Map<String, List<String>> highlights
+        Set<Long> preferredSkillIds
 ) {
 
 }

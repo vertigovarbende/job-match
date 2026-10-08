@@ -9,14 +9,11 @@ import com.deveyk.jobmatch.job.application.port.in.command.CreateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.PublishJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.UpdateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
-import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
-import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.presentation.rest.mapper.JobRequestMapper;
 import com.deveyk.jobmatch.job.presentation.rest.mapper.JobResponseMapper;
 import com.deveyk.jobmatch.job.presentation.rest.request.CreateJobRequest;
 import com.deveyk.jobmatch.job.presentation.rest.request.JobListRequest;
-import com.deveyk.jobmatch.job.presentation.rest.request.JobSearchRequest;
 import com.deveyk.jobmatch.job.presentation.rest.request.UpdateJobRequest;
 import com.deveyk.jobmatch.job.presentation.rest.response.JobResponse;
 import com.deveyk.jobmatch.shared.domain.exception.FieldInvalidException;
@@ -100,24 +97,6 @@ public class JobController {
         final Job job = this.jobUseCase.archiveJob(command);
 
         return BaseResponse.success(this.jobResponseMapper.toResponse(job));
-    }
-
-    @GetMapping(JobApiPaths.SEARCH)
-    public BaseResponse<JmPageResponse<JobResponse>> searchPublishedJobs(@Valid final JobSearchRequest request) {
-
-        if (!request.isOrderPropertyAccepted()) {
-            throw new FieldInvalidException("sort", "must be one of the accepted properties");
-        }
-
-        final JobSearchCriteria criteria = this.jobRequestMapper.toCriteria(request);
-        final JmPage<JobSearchResult> page = this.jobUseCase.searchPublishedJobs(criteria, request.getPageable().toPageable());
-        final List<JobResponse> content = this.jobResponseMapper.toResponseListFromSearchResults(page.getContent());
-
-        final JmPageResponse<JobResponse> response = JmPageResponse.<JobResponse>builder()
-                .of(page, content)
-                .build();
-
-        return BaseResponse.success(response);
     }
 
     @GetMapping(JobApiPaths.BASE)
