@@ -2,6 +2,7 @@ package com.deveyk.jobmatch.job.infrastructure.elasticsearch.adapter;
 
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
+import com.deveyk.jobmatch.job.application.port.out.JobSearchPort;
 import com.deveyk.jobmatch.job.infrastructure.elasticsearch.JobDocument;
 import com.deveyk.jobmatch.job.infrastructure.elasticsearch.filter.JobSearchDocumentFilter;
 import com.deveyk.jobmatch.job.infrastructure.elasticsearch.mapper.JobDocumentMapper;
@@ -20,12 +21,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JobSearchQueryAdapter {
+public class JobSearchQueryAdapter implements JobSearchPort {
 
     private final ElasticsearchOperations elasticsearchOperations;
     private final JobDocumentMapper jobDocumentMapper;
 
-    public JmPage<JobSearchResult> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
+    @Override
+    public JmPage<JobSearchResult> search(final JobSearchCriteria criteria, final Pageable pageable) {
 
         final JobSearchDocumentFilter filter = JobSearchDocumentFilter.builder()
                 .q(criteria.q())

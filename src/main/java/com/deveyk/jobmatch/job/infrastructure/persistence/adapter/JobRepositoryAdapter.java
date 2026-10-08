@@ -1,15 +1,12 @@
 package com.deveyk.jobmatch.job.infrastructure.persistence.adapter;
 
 import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
-import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
-import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
 import com.deveyk.jobmatch.job.domain.JobSkillType;
 import com.deveyk.jobmatch.job.domain.exception.DuplicateSkillReferenceException;
 import com.deveyk.jobmatch.job.domain.exception.JobFieldInvalidException;
 import com.deveyk.jobmatch.job.domain.model.Job;
 import com.deveyk.jobmatch.job.domain.model.JobStatusType;
-import com.deveyk.jobmatch.job.infrastructure.elasticsearch.adapter.JobSearchQueryAdapter;
 import com.deveyk.jobmatch.job.infrastructure.persistence.entity.JobEntity;
 import com.deveyk.jobmatch.job.infrastructure.persistence.entity.JobSkillEntity;
 import com.deveyk.jobmatch.job.infrastructure.persistence.filter.JobListFilter;
@@ -44,7 +41,6 @@ public class JobRepositoryAdapter implements JobRepository {
     private final SpringDataJobJpaRepository springDataJobJpaRepository;
     private final SpringDataJobSkillJpaRepository springDataJobSkillJpaRepository;
     private final JobPersistenceMapper jobPersistenceMapper;
-    private final JobSearchQueryAdapter jobSearchQueryAdapter;
 
     @Override
     public Optional<Job> findById(final Long id) {
@@ -67,11 +63,6 @@ public class JobRepositoryAdapter implements JobRepository {
     @Override
     public List<Job> findAllByStatusAndExpiresAtBefore(final JobStatusType status, final LocalDateTime cutoff) {
         return this.toDomainListWithSkills(this.springDataJobJpaRepository.findAllByStatusAndExpiresAtBefore(status, cutoff));
-    }
-
-    @Override
-    public JmPage<JobSearchResult> findAllPublished(final JobSearchCriteria criteria, final Pageable pageable) {
-        return this.jobSearchQueryAdapter.findAllPublished(criteria, pageable);
     }
 
     @Override

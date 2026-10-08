@@ -10,6 +10,7 @@ import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
 import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
+import com.deveyk.jobmatch.job.application.port.out.JobSearchPort;
 import com.deveyk.jobmatch.job.application.service.JobService;
 import com.deveyk.jobmatch.job.domain.event.JobArchivedEvent;
 import com.deveyk.jobmatch.job.domain.event.JobClosedEvent;
@@ -62,6 +63,9 @@ class JobServiceTest {
 
     @Mock
     private JobRepository jobRepository;
+
+    @Mock
+    private JobSearchPort jobSearchPort;
 
     @Mock
     private CurrentCompanyFacade currentCompanyFacade;
@@ -424,8 +428,8 @@ class JobServiceTest {
     }
 
     @Test
-    @DisplayName("searchPublishedJobs() criteria ve pageable'i oldugu gibi repository'ye iletir")
-    void searchPublishedJobs_delegatesToRepositoryWithGivenCriteriaAndPageable() {
+    @DisplayName("searchPublishedJobs() criteria ve pageable'i oldugu gibi search port'una iletir")
+    void searchPublishedJobs_delegatesToSearchPortWithGivenCriteriaAndPageable() {
 
         final JobSearchCriteria criteria = JobSearchCriteria.builder()
                 .q("backend")
@@ -440,12 +444,12 @@ class JobServiceTest {
 
         final Pageable pageable = Pageable.ofSize(20);
         final JmPage<JobSearchResult> expected = JmPage.<JobSearchResult>builder().build();
-        when(this.jobRepository.findAllPublished(criteria, pageable)).thenReturn(expected);
+        when(this.jobSearchPort.search(criteria, pageable)).thenReturn(expected);
 
         final JmPage<JobSearchResult> result = this.jobService.searchPublishedJobs(criteria, pageable);
 
         assertThat(result).isSameAs(expected);
-        verify(this.jobRepository).findAllPublished(criteria, pageable);
+        verify(this.jobSearchPort).search(criteria, pageable);
 
     }
 
