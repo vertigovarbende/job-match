@@ -7,10 +7,7 @@ import com.deveyk.jobmatch.job.application.port.in.command.CreateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.PublishJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.command.UpdateJobCommand;
 import com.deveyk.jobmatch.job.application.port.in.query.JobListCriteria;
-import com.deveyk.jobmatch.job.application.port.in.query.JobSearchCriteria;
-import com.deveyk.jobmatch.job.application.port.in.query.JobSearchResult;
 import com.deveyk.jobmatch.job.application.port.out.JobRepository;
-import com.deveyk.jobmatch.job.application.port.out.JobSearchPort;
 import com.deveyk.jobmatch.job.application.service.JobService;
 import com.deveyk.jobmatch.job.domain.event.JobArchivedEvent;
 import com.deveyk.jobmatch.job.domain.event.JobClosedEvent;
@@ -63,9 +60,6 @@ class JobServiceTest {
 
     @Mock
     private JobRepository jobRepository;
-
-    @Mock
-    private JobSearchPort jobSearchPort;
 
     @Mock
     private CurrentCompanyFacade currentCompanyFacade;
@@ -424,32 +418,6 @@ class JobServiceTest {
 
         assertThatThrownBy(() -> this.jobService.expireJob(404L))
                 .isInstanceOf(JobNotFoundException.class);
-
-    }
-
-    @Test
-    @DisplayName("searchPublishedJobs() criteria ve pageable'i oldugu gibi search port'una iletir")
-    void searchPublishedJobs_delegatesToSearchPortWithGivenCriteriaAndPageable() {
-
-        final JobSearchCriteria criteria = JobSearchCriteria.builder()
-                .q("backend")
-                .seniority(Seniority.MID_SENIOR)
-                .employmentType(EmploymentType.FULL_TIME)
-                .workplaceType(WorkplaceType.REMOTE)
-                .locationCountry("Turkiye")
-                .locationCity("Istanbul")
-                .salaryMin(BigDecimal.valueOf(50000))
-                .skillIds(Set.of(1L))
-                .build();
-
-        final Pageable pageable = Pageable.ofSize(20);
-        final JmPage<JobSearchResult> expected = JmPage.<JobSearchResult>builder().build();
-        when(this.jobSearchPort.search(criteria, pageable)).thenReturn(expected);
-
-        final JmPage<JobSearchResult> result = this.jobService.searchPublishedJobs(criteria, pageable);
-
-        assertThat(result).isSameAs(expected);
-        verify(this.jobSearchPort).search(criteria, pageable);
 
     }
 
